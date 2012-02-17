@@ -18,9 +18,13 @@
 			});
 
 			ed.onNodeChange.add(function(ed, cm, n) {
-				//cm.setActive('exercise', n.nodeName == 'IMG');
-                //cm.setDisabled('bold', true);
-                return false;
+				var exercise = ed.dom.getParent(n, 'exercise');
+                active = exercise == null;
+                if (active) {
+                    cm.setActive('exercise', true);
+                } else {
+                    cm.setDisabled('exercise', true);
+                }
 			});
 		},
 
