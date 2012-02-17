@@ -19,12 +19,7 @@
 
 			ed.onNodeChange.add(function(ed, cm, n) {
 				var exercise = ed.dom.getParent(n, 'exercise');
-                active = exercise == null;
-                if (active) {
-                    cm.setActive('exercise', true);
-                } else {
-                    cm.setDisabled('exercise', true);
-                }
+                cm.setDisabled('exercise', exercise != null);
 			});
 		},
 
