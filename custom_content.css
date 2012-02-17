@@ -1,0 +1,18 @@
+exercise, solution, problem {
+    display:block;
+}
+exercise {
+    counter-increment: exerciseno;
+    margin-left: 2em;
+    border-left: 1px solid #ccc;
+    padding-left: 1em;
+}
+exercise:before {
+    content: "Exercise " counter(exerciseno);
+    font-weight: bold;
+}
+
+solution:before {
+    content: "Solution: ";
+    font-weight: bold;
+}
