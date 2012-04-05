@@ -1,0 +1,100 @@
+I went through all the published content looking for what elements were most common and what their most common children were.
+Anything that had less than 1000 occurrences were removed for brevity.
+
+Here's the dump:
+
+(count)	(parent)	(child)
+117281	content	para
+63590	content	section
+8179	content	list
+6483	content	figure
+4524	content	exercise
+1941	content	table
+1928	content	equation
+1279	content	note
+1019	content	example
+...
+
+
+For each, what to implement next:
+
+121330	para	emphasis
+34537	para	link
+18877	para	code
+16401	para	term
+13228	para	figure
+12170	para	cnxn
+8059	para	sub
+5912	para	sup
+5355	para	newline
+5125	para	media
+3592	para	equation
+3486	para	title
+3147	para	list
+2394	para	footnote
+2208	para	note
+2142	para	cite
+2127	para	quote
+1916	para	foreign
+1297	para	space
+1238	para	name
+...
+
+
+560847	section	para
+85623	section	title
+45702	section	list
+39125	section	section
+21647	section	figure
+16290	section	name
+15713	section	table
+13921	section	exercise
+9160	section	equation
+4068	section	example
+1687	section	code
+1578	section	note
+...
+
+
+212532	list	item
+1693	list	title
+...
+
+
+43308	figure	media
+12570	figure	caption
+2796	figure	name
+2513	figure	title
+1721	figure	subfigure
+
+
+18899	exercise	problem
+11474	exercise	solution
+...
+
+
+19655	table	tgroup
+120784	tbody	row
+70978	tgroup	colspec
+19655	tgroup	tbody
+1086	tgroup	thead
+1469	thead	row
+...
+
+
+1211	note	link
+...
+
+
+14565	example	para
+1041	example	title
+...
+
+
+
+
+
+
+
+
+
