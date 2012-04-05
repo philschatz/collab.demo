@@ -6,14 +6,14 @@
 			init : function(ed, ul) {
 				ed.addCommand('mceSection', function(ui,v) {
 					    if (v==true) {
-						 var el = ed.dom.create('section', {}, '<p>[Enter section content here]</p>');
+						 var el = ed.dom.create('section', {}, '<h2 class="title">[Title]</h2><p>[Enter section content here]</p>');
 						 ed.selection.setNode(el);   
 					    } else {
 						 var selected = ed.selection.getNode();
 						 var par = ed.dom.getParent(selected,'section');
 						 ed.selection.select(par);
 						 ed.selection.collapse(false);
-						 var el = ed.dom.create('section', {}, '<p>[Enter section content here]</p>');
+						 var el = ed.dom.create('section', {}, '<h2 class="title">[Title]</h2><p>[Enter section content here]</p>');
 						 ed.selection.setNode(el); 
 					    }
                                 });

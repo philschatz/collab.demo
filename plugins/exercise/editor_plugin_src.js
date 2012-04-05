@@ -5,17 +5,17 @@
 	tinymce.create('tinymce.plugins.ExercisePlugin', {
 		init : function(ed, url) {
 			ed.addCommand('mceExercise', function() {
-					var el = ed.dom.create('exercise', {},
-						'<problem><p>[Enter your problem here]</p></problem><solution><p>[Enter your solution here]</p></solution><p>&nbsp;</p>');
+					var el = ed.dom.create('div', { 'class': 'exercise'},
+						'<h2 class="title">[Title]</h2><div class="problem"><p>[Enter your problem here]</p></div><div class="solution"><p>[Enter your solution here]</p></div>');
                                         ed.selection.setNode(el);
                                         console.debug(tinyMCE.activeEditor.getContent());
 			});
 			ed.addCommand('mceSolution', function() {
 					var selected = ed.selection.getNode();
-					var par = ed.dom.getParent(selected,'problem,solution');
+					var par = ed.dom.getParent(selected,'.problem,.solution');
 					ed.selection.select(par);
 					ed.selection.collapse(false);
-					var el = ed.dom.create('solution',{},'<p>[Enter your solution here]</p>');
+					var el = ed.dom.create('div',{'class': 'solution'},'<p>[Enter your solution here]</p>');
 					ed.selection.setNode(el);
 			});
 			
@@ -31,9 +31,9 @@
 			});
 		
 			ed.onNodeChange.add(function(ed, cm, n) {
-				var exercise = ed.dom.getParent(n, 'exercise');
+				var exercise = ed.dom.getParent(n, '.exercise');
 				cm.setDisabled('exercise', exercise != null);
-				cm.setDisabled('solution', ed.dom.getParent(n, 'problem,solution') == null);
+				cm.setDisabled('solution', ed.dom.getParent(n, '.problem,.solution') == null);
 			});
 		},
 
