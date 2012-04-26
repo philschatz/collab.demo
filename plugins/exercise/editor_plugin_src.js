@@ -6,7 +6,7 @@
 		init : function(ed, url) {
 			ed.addCommand('mceExercise', function() {
 					var el = ed.dom.create('div', { 'class': 'exercise'},
-						'<h2 class="title">[Title]</h2><div class="problem"><p>[Enter your problem here]</p></div><div class="solution"><p>[Enter your solution here]</p></div>');
+						'<h2 class="title">[Title]</h2><div class="problem"><h2 class="title">[Title]</h2><p>[Enter your problem here]</p></div><div class="solution"><h2 class="title">[Title]</h2><p>[Enter your solution here]</p></div>');
                                         ed.selection.setNode(el);
                                         console.debug(tinyMCE.activeEditor.getContent());
 			});
