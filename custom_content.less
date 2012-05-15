@@ -1,14 +1,23 @@
 .mceContentBody { .x-html5 (0.5em); }
 
+
+span.empty {
+  color: black;
+  opacity: 0.5;
+}
+
+.empty {
+  cursor: pointer;
+}
+
+.cursor {
+  cursor: vertical-text;
+}
+
 .x-html5 (@left-padding) {
 
     counter-reset: section figure example exercise;
-  
-    /*.title*/.empty {
-      color: black;
-      opacity: 0.5;
-    }
-  
+    
     .x-block-title () {
       float: left;
       display: inline;
@@ -59,6 +68,7 @@
     .note { .x-blockish("Note: ", note, #52E052, #E9FBE9); }
     .example { .x-blockish("Example " counter(example) ": ", example, #8CCBF2, #DEF); }
     .exercise { .x-blockish("Exercise " counter(exercise) ": ", exercise, #E0CB52, #FCFAEE); }
+    .figure { .x-blockish("Figure " counter(figure) ": ", figure, #E0CB52, #FCFAEE); }
     
     .solution:not(.empty) {
       .x-block;
@@ -68,5 +78,14 @@
       }
       border-color: #cccccc;
     }
-}
 
+    .problem:not(.empty) {
+      .x-block;
+      &::before {
+        content: "Problem: ";
+        color: #999999;
+      }
+      border-color: #cccccc;
+    }
+
+}

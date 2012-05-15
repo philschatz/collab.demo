@@ -29,31 +29,31 @@ All the Elements: Rules in EBNF ( http://www.w3.org/TR/REC-xml/#sec-notation )
 
 // Meta-rules (containers for common rules)
 START:	[ document ]
-{LABEL_TITLE}:	( label )? ( title )?
+{LABEL_TITLE}:	?( label )? ?( title )?
 
 {BLOCKISH}:	[ quote  preformat  list ]                     # these can be block or inline elements (depending on context)
 {STRICTLY_INLINE}:	[ emphasis  term  foreign  cite  span  sup  sub  code ]
 {INLINE}:	[ {STRICTLY_INLINE}  {BLOCKISH} ]                 # These are inline elements plus elements that appear both as blocks and inline
 {ANY_INLINE}:	[ {INLINE} cite-title  note  media  footnote  link  newline  space ]
 {ONLY_STRICTLY_INLINE}:	( {STRICTLY_INLINE} )+
-{ONLY_INLINE}:	( {INLINE} )+
-{ONLY_ANY_INLINE}:	( {ANY_INLINE} )*
+{ONLY_INLINE}:	+( {INLINE} )+
+{ONLY_ANY_INLINE}:	*( {ANY_INLINE} )*
 {PARA_INLINE_BLOCK}:	([ para  {ANY_INLINE}  {BLOCK} ]) # These are a choice: either the child is a block (or a para), or an unwrapped para ({ANY_INLINE})
 
 {BLOCK}:	[ {BLOCKISH}  div  definition  example  figure  code  note  media  table  rule  equation  exercise ]
-{ANY_BLOCK}:	([ section  {BLOCK}  para ])+             # block elements plus the loosest element, section (basically, anything goes!)
+{ANY_BLOCK}:	+([ section  {BLOCK}  para ])+             # block elements plus the loosest element, section (basically, anything goes!)
 {TITLE_BLOCK}:	{LABEL_TITLE} {ANY_BLOCK}                # Same as above but the element can have a title/label
 
-{MEDIA_TEXT}:	( longdesc )?( param )*([ {STRICTLY_INLINE} cite-title  preformat  quote  note  list  object  image  audio  video  java-applet  flash  labview  text  download ])*
+{MEDIA_TEXT}:	?( longdesc )? *( param )* *( [ {STRICTLY_INLINE} cite-title  preformat  quote  note  list  object  image  audio  video  java-applet  flash  labview  text  download ] )*
 
 --------------------------------------
 Rules that apply to several elements:
 --------------------------------------
 
-quote, note, item:	                ( label )? {ONLY_ANY_INLINE}
-div, preformat, footnote, meaning:	( title )? ( {PARA_INLINE_BLOCK} )+
-quote, note, commentary:	          {LABEL_TITLE} ( {PARA_INLINE_BLOCK} )+
-quote, preformat:	                  ([ para {ONLY_INLINE}])+
+quote, note, item:	                ?( label )? {ONLY_ANY_INLINE}
+div, preformat, footnote, meaning:	?( title )? +( {PARA_INLINE_BLOCK} )+
+quote, note, commentary:	          {LABEL_TITLE} +( {PARA_INLINE_BLOCK} )+
+quote, preformat:	                  +( [ para {ONLY_INLINE} ] )+
 item, para:	                        {ONLY_INLINE}
 term, foreign, cite, span, sup, sub, code, emphasis:	{ONLY_STRICTLY_INLINE}
 section, example, problem, solution, statement, proof:	{TITLE_BLOCK}
@@ -63,20 +63,20 @@ preformat, title, label, span, cite, cite-title, link, emphasis, term, sub, sup,
 Rules that only apply to only 1 element
 ----------------------------------------
 
-glossary:	( definition )+
-definition:	( label )? term [ seealso ( meaning ( example )* )+ ( seealso )? ]
-seealso:	( label )? ( term )+
-list:	( item )+
-list:	{LABEL_TITLE} ( item )+
-rule:	{LABEL_TITLE} ( statement )+ ([ proof  example ])*
+glossary:	+( definition )+
+definition:	?( label )? term [ seealso +( meaning *( example )* )+ ?( seealso )? ]
+seealso:	?( label )? +( term )+
+list:	+( item )+
+list:	{LABEL_TITLE} +( item )+
+rule:	{LABEL_TITLE} +( statement )+ +( [ proof  example ] )*
 exercise:	{LABEL_TITLE} [ problem ( solution )* ( commentary )? item ]
-figure:	{LABEL_TITLE} [ media  table  code  ( subfigure )+ ] ( caption )?
-subfigure:	{LABEL_TITLE} [ media  table  code ] ( caption )?
+figure:	{LABEL_TITLE} [ media  table  code  +( subfigure )+ ] ?( caption )?
+subfigure:	{LABEL_TITLE} [ media  table  code ] ?( caption )?
 
-item:	( label )? {PARA_INLINE_BLOCK}*
-para:	( title )? ( [ {ANY_INLINE}  {BLOCK} ] )+      # Almost a {PARA_INLINE_BLOCK}+ except that nesting para's are not allowed
-code:	( {ANY_INLINE} )+
-code:	{LABEL_TITLE} ( {ANY_INLINE} )+ ( caption )?
+item:	?( label )? *( {PARA_INLINE_BLOCK} )*
+para:	?( title )? +( [ {ANY_INLINE} {BLOCK} ] )+      # Almost a {PARA_INLINE_BLOCK}+ except that nesting para's are not allowed
+code:	+( {ANY_INLINE} )+
+code:	{LABEL_TITLE} +( {ANY_INLINE} )+ ?( caption )?
 equation:	{LABEL_TITLE} [ media ]
 
 ------------------------
