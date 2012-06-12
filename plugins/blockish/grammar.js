@@ -16,21 +16,25 @@ This file will also need to:
 */
 
 (function() {
-  var ANY_BLOCK, ANY_INLINE, AUTO_INSERTED, BLOCK, BLOCKISH, ELEMENTS, HTML_ELEMENTS, HTML_ELEMENTS_INVERTED, INLINE, LABEL_TITLE, MEDIA_TEXT, Node, ONLY_ANY_INLINE, ONLY_INLINE, ONLY_STRICTLY_INLINE, One, Opt, Or, PARA_INLINE_BLOCK, RULES, Rule, START, STRICTLY_INLINE, Seq, TITLE_BLOCK, Terminal, Zero, child, el2, element, flag, htmlToElement, invalidParents, key, n, parent, populate, rule, validParents, value, values, x, _, _i, _j, _k, _l, _len, _len2, _len3, _len4, _len5, _m, _ref,
+  var ANY_BLOCK, ANY_INLINE, AUTO_INSERTED, BLOCK, BLOCKISH, G, INLINE, LABEL_TITLE, MEDIA_TEXT, ONLY_ANY_INLINE, ONLY_INLINE, ONLY_STRICTLY_INLINE, One, Opt, Or, PARA_INLINE_BLOCK, Rule, START, STRICTLY_INLINE, Seq, TITLE_BLOCK, Terminal, Zero, child, el2, element, flag, htmlToElement, invalidParents, key, n, parent, populate, rule, validParents, value, values, x, _, _i, _j, _k, _l, _len, _len2, _len3, _len4, _len5, _m, _ref, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7,
     __indexOf = Array.prototype.indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
-  AUTO_INSERTED = ['title', 'caption', 'problem', 'solution', 'statement', 'proof', 'item', 'para'];
+  G = {};
 
-  RULES = {};
+  AUTO_INSERTED = ['caption', 'problem', 'solution', 'statement', 'proof', 'item', 'para'];
+
+  G.Rules = {};
+
+  G.Root = '_root';
 
   populate = function(elements, rule) {
     var name, _i, _len, _results;
     _results = [];
     for (_i = 0, _len = elements.length; _i < _len; _i++) {
       name = elements[_i];
-      _results.push(RULES[name] = rule);
+      _results.push(G.Rules[name] = rule);
     }
     return _results;
   };
@@ -83,12 +87,10 @@ This file will also need to:
     };
 
     Terminal.prototype.consumeChildren = function(childNodes) {
-      var child, rule;
-      child = childNodes[0];
-      if (this.name === child.name) {
-        rule = RULES[this.name];
-        rule.consumeChildren(child.children);
-        if (child.children.length === 0) return childNodes.splice(0, 1);
+      var child;
+      if (childNodes.length !== 0) {
+        child = childNodes[0];
+        if (this.name === child) return childNodes.splice(0, 1);
       }
     };
 
@@ -222,6 +224,10 @@ This file will also need to:
 
     One.prototype.consumeChildren = function(childNodes) {
       var child, _i, _len, _results;
+      if (!childNodes) {
+        console.log("");
+        console.log("SIOUSRER");
+      }
       _results = [];
       for (_i = 0, _len = childNodes.length; _i < _len; _i++) {
         child = childNodes[_i];
@@ -290,6 +296,8 @@ This file will also need to:
 
   populate(['preformat', 'title', 'label', 'span', 'cite', 'cite-title', 'link', 'emphasis', 'term', 'sub', 'sup', 'foreign', 'caption'], ONLY_ANY_INLINE);
 
+  populate([G.Root], ANY_BLOCK);
+
   populate(['glossary'], new One('definition'));
 
   populate(['definition'], new Seq([new Opt('label'), 'term', new Or(['seealso', new One('meaning', new Zero('example')), new Opt('seealso')])]));
@@ -316,7 +324,8 @@ This file will also need to:
 
   populate(['equation'], new Seq([LABEL_TITLE, new Or(['media'])]));
 
-  HTML_ELEMENTS_INVERTED = {
+  G.Elements_INVERTED = {
+    body: [G.Root],
     div: ['note', 'div', 'footnote', 'meaning', 'commentary', 'section', 'example', 'exercise', 'problem', 'solution', 'statement', 'proof', 'code', 'rule', 'equation'],
     span: ['preformat', 'term', 'foreign', 'cite', 'span', 'cite-title', 'caption', 'seealso', 'label'],
     dl: ['glossary'],
@@ -334,64 +343,108 @@ This file will also need to:
     figure: ['figure', 'subfigure']
   };
 
-  HTML_ELEMENTS = {};
+  G.Elements = {};
 
-  for (key in HTML_ELEMENTS_INVERTED) {
-    values = HTML_ELEMENTS_INVERTED[key];
+  _ref = G.Elements_INVERTED;
+  for (key in _ref) {
+    values = _ref[key];
     for (_i = 0, _len = values.length; _i < _len; _i++) {
       value = values[_i];
-      HTML_ELEMENTS[value] = key;
+      G.Elements[value] = key;
     }
   }
 
-  ELEMENTS = (function() {
-    var _results;
+  G.AllElements = (function() {
+    var _ref2, _results;
+    _ref2 = G.Rules;
     _results = [];
-    for (x in RULES) {
-      _ = RULES[x];
+    for (x in _ref2) {
+      _ = _ref2[x];
       _results.push(x);
     }
     return _results;
   })();
 
   htmlToElement = function($el) {
-    var name, tag, _j, _len2, _ref;
-    tag = $el.get(0).tagName;
-    if (__indexOf.call(HTML_ELEMENTS_INVERTED, tag) >= 0) {
-      if (HTML_ELEMENTS_INVERTED[tag].length === 1) {
-        return HTML_ELEMENTS_INVERTED[tag];
+    var name, tag, _j, _len2, _ref2;
+    tag = $el.get(0).tagName.toLowerCase();
+    if (tag in G.Elements_INVERTED) {
+      if (G.Elements_INVERTED[tag].length === 1) {
+        return G.Elements_INVERTED[tag][0];
       } else {
-        _ref = HTML_ELEMENTS_INVERTED[tag];
-        for (_j = 0, _len2 = _ref.length; _j < _len2; _j++) {
-          name = _ref[_j];
+        _ref2 = G.Elements_INVERTED[tag];
+        for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
+          name = _ref2[_j];
           if ($el.hasClass(name)) return name;
         }
       }
     } else {
+      console.log("Could not parse a " + tag);
       return null;
     }
   };
 
-  Node = (function() {
+  G.Node = (function() {
 
-    function Node(name, children) {
+    function Node($el, depth, name, children) {
+      if (depth == null) depth = -1;
       this.name = name != null ? name : null;
       this.children = children != null ? children : [];
+      if ($el) this.parseHtml($el, depth);
     }
 
-    Node.prototype.parseHtml = function($el) {
-      var child, n, _j, _len2, _ref, _results;
+    Node.prototype.parseHtml = function($el, depth) {
+      var child, n, _j, _len2, _ref2, _ref3, _results;
       this.$el = $el;
+      if (depth == null) depth = -1;
       this.name = htmlToElement(this.$el);
-      _ref = this.$el.children();
-      _results = [];
-      for (_j = 0, _len2 = _ref.length; _j < _len2; _j++) {
-        child = _ref[_j];
-        n = new Node();
-        n.parseHtml(child);
-        _results.push(this.children.push(n));
+      if (this.name) {
+        if (depth !== 0) {
+          _ref2 = this.$el.children();
+          _results = [];
+          for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
+            child = _ref2[_j];
+            n = new G.Node();
+            n.parseHtml($(child), (_ref3 = depth === -1) != null ? _ref3 : -{
+              1: depth - 1
+            });
+            if (n.name) {
+              _results.push(this.children.push(n));
+            } else {
+              _results.push(void 0);
+            }
+          }
+          return _results;
+        }
       }
-      return _results;
+    };
+
+    Node.prototype.allowsForA = function(name) {
+      var child, children;
+      if (this.name && this.children) {
+        children = (function() {
+          var _j, _len2, _ref2, _results;
+          _ref2 = this.children;
+          _results = [];
+          for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
+            child = _ref2[_j];
+            _results.push(child.name);
+          }
+          return _results;
+        }).call(this);
+        switch (name) {
+          case 'title':
+            children.splice(0, 0, name);
+            break;
+          case 'label':
+            children.splice(0, 0, name);
+            break;
+          default:
+            children.push(name);
+        }
+        G.Rules[this.name].consumeChildren(children);
+        return children.length === 0;
+      }
     };
 
     return Node;
@@ -400,60 +453,61 @@ This file will also need to:
 
   if (typeof window !== "undefined" && window !== null) {
     window.Cnx = window.Cnx || {};
-    window.Cnx.Grammar = {
-      AllElements: ELEMENTS,
-      Rules: RULES,
-      Elements: HTML_ELEMENTS
-    };
+    window.Cnx.Grammar = G;
   } else {
     console.log("---------------------------------------------");
     console.log("Which elements will be autogenerated (optional/required)");
     console.log("  when a new element of this type is created?");
     console.log("---------------------------------------------");
-    for (key in RULES) {
-      rule = RULES[key];
+    _ref2 = G.Rules;
+    for (key in _ref2) {
+      rule = _ref2[key];
       console.log("(Debug) Rule: " + key + ": " + (rule.templateChildren()));
     }
     console.log("---------------------------------------------");
     console.log("What are all the possible children of this element?");
     console.log("---------------------------------------------");
-    for (key in RULES) {
-      rule = RULES[key];
+    _ref3 = G.Rules;
+    for (key in _ref3) {
+      rule = _ref3[key];
       console.log("(Debug) Rule: " + key + ": " + (rule.children()));
     }
     console.log("---------------------------------------------");
     console.log("Some unit tests on the grammar.");
     console.log("---------------------------------------------");
-    n = new Node('list', [new Node('item'), new Node('item')]);
-    rule = RULES[n.name];
+    n = new G.Node('list', [new G.Node('item'), new G.Node('item')]);
+    rule = G.Rules[n.name];
     rule.consumeChildren(n.children);
     console.log("Expected: 0   Got: " + n.children.length);
-    n = new Node('list', [new Node('item'), new Node('term')]);
-    rule = RULES[n.name];
+    n = new G.Node('list', [new G.Node('item'), new G.Node('term')]);
+    rule = G.Rules[n.name];
     rule.consumeChildren(n.children);
     console.log("Expected: 1   Got: " + n.children.length);
     console.log("---------------------------------------------");
     console.log("Which elements can be upconverted into other elements");
     console.log("  (assuming all of their child nodes are populated)");
     console.log("---------------------------------------------");
-    for (_j = 0, _len2 = ELEMENTS.length; _j < _len2; _j++) {
-      element = ELEMENTS[_j];
-      for (_k = 0, _len3 = ELEMENTS.length; _k < _len3; _k++) {
-        el2 = ELEMENTS[_k];
+    _ref4 = G.AllElements;
+    for (_j = 0, _len2 = _ref4.length; _j < _len2; _j++) {
+      element = _ref4[_j];
+      _ref5 = G.AllElements;
+      for (_k = 0, _len3 = _ref5.length; _k < _len3; _k++) {
+        el2 = _ref5[_k];
         if (element !== el2) {
           flag = false;
-          _ref = RULES[element].children();
-          for (_l = 0, _len4 = _ref.length; _l < _len4; _l++) {
-            child = _ref[_l];
-            if (__indexOf.call(RULES[el2].children(), child) < 0) flag = true;
+          _ref6 = G.Rules[element].children();
+          for (_l = 0, _len4 = _ref6.length; _l < _len4; _l++) {
+            child = _ref6[_l];
+            if (__indexOf.call(G.Rules[el2].children(), child) < 0) flag = true;
           }
           if (!flag) {
             invalidParents = [];
             validParents = [];
-            for (_m = 0, _len5 = ELEMENTS.length; _m < _len5; _m++) {
-              parent = ELEMENTS[_m];
-              if (__indexOf.call(RULES[parent].children(), element) >= 0) {
-                if (__indexOf.call(RULES[parent].children(), el2) >= 0) {
+            _ref7 = G.AllElements;
+            for (_m = 0, _len5 = _ref7.length; _m < _len5; _m++) {
+              parent = _ref7[_m];
+              if (__indexOf.call(G.Rules[parent].children(), element) >= 0) {
+                if (__indexOf.call(G.Rules[parent].children(), el2) >= 0) {
                   validParents.push(parent);
                 } else {
                   invalidParents.push(parent);

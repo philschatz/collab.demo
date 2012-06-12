@@ -2,7 +2,7 @@
 
   tinymce.create('tinymce.plugins.BlockishSelectionPlugin', {
     init: function(ed, url) {
-      var G, mkJQuery;
+      var G, allowsForA, ancestorThatAllowsForA, mkJQuery;
       G = Cnx.Grammar;
       mkJQuery = function() {
         return function(selector) {
@@ -17,6 +17,18 @@
             }
           }
         };
+      };
+      allowsForA = function($el, childName) {
+        var n;
+        n = new G.Node($el, 1);
+        return n.allowsForA(childName);
+      };
+      ancestorThatAllowsForA = function($el, childName) {
+        if (allowsForA($el, childName)) {
+          return allowsForA($el, childName);
+        } else {
+          return allowsForA($el.parent(), childName);
+        }
       };
       ed.onInit.add(function(ed, cm, n) {
         var $, $body, $startSelect;
@@ -42,34 +54,47 @@
           return $body.attr('contenteditable', true);
         });
         return ed.onNodeChange.add(function(ed, cm, el) {
-          var $el, range, text;
+          var $el, name, range, text, _i, _len, _ref, _results;
           console.log("node Change!");
           console.log(ed.selection.getRng());
           $el = $(el);
+          if ($el.attr('data-mce-bogus')) $el = $($el.parent());
           if ($el.hasClass('empty')) {
             range = ed.selection.getRng();
             text = range.commonAncestorContainer.textContent;
             if (!($el.data('original') != null)) $el.data('original', text);
-            return ed.selection.select(el);
+            ed.selection.select(el);
           }
+          _ref = G.AllElements;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            name = _ref[_i];
+            cm.setDisabled(name, true);
+            if (ancestorThatAllowsForA($el, name)) {
+              _results.push(cm.setDisabled(name, false));
+            } else {
+              _results.push(void 0);
+            }
+          }
+          return _results;
         });
-        /*
-              ed.onKeyPress.add (ed, evt) ->
-                console.log "on Change!"
-                el = ed.selection.getNode()
-                $el = $(el)
-                if $el.hasClass 'empty'
-                  # TODO select all the text but not the element
-                  # See http://www.tinymce.com/wiki.php/API3:method.tinymce.dom.Selection.getRng and setRng
-                  range = ed.selection.getRng()
-                  text = range.commonAncestorContainer.textContent
-        
-                  # Discard the "Empty" span (since a keypress occurred)
-                  #$el.parent().text(text)
-                  ed.selection.setNode($el.parent().get(0))
-                  $el.remove()
-        */
       });
+      /*
+          ed.onKeyPress.add (ed, evt) ->
+            console.log "on Change!"
+            el = ed.selection.getNode()
+            $el = $(el)
+            if $el.hasClass 'empty'
+              # TODO select all the text but not the element
+              # See http://www.tinymce.com/wiki.php/API3:method.tinymce.dom.Selection.getRng and setRng
+              range = ed.selection.getRng()
+              text = range.commonAncestorContainer.textContent
+      
+              # Discard the "Empty" span (since a keypress occurred)
+              #$el.parent().text(text)
+              ed.selection.setNode($el.parent().get(0))
+              $el.remove()
+      */
       return ed.onBeforeRenderUI.add(function() {
         var $, buildTemplate, f, name, _i, _len, _ref, _results;
         $ = mkJQuery();
@@ -93,7 +118,7 @@
               $el = emptyPlaceholder(tag, '...').addClass(name);
               break;
             default:
-              $el = $("<" + tag + "/>").addClass(name);
+              $el = $("<" + tag + " itemtype='" + name + "'/>").addClass(name);
           }
           _ref = G.Rules[name].templateChildren();
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -114,6 +139,10 @@
               $template = buildTemplate(name);
               context = ed.selection.getNode();
               $context = $(context);
+              if ($context.attr('data-mce-bogus')) $context = $($context.parent());
+              if (ancestorThatAllowsForA($context, name)) {
+                $template.prepend(ancestorThatAllowsForA($context, name));
+              }
               $template.insertAfter($context);
               hasContent = $context.children("*:not([data-mce-bogus],.empty)").length > 0 || $context.text().length > 0;
               if (!hasContent && $context.get(0).tagName.toLowerCase() === 'p') {

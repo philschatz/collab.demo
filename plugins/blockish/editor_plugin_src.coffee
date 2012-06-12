@@ -17,6 +17,19 @@ tinymce.create 'tinymce.plugins.BlockishSelectionPlugin',
           else
             jQuery ed.getDoc()
     
+    # Compare all the children currently in the element with the grammar to see if
+    # we can add childName to it
+    allowsForA = ($el, childName) ->
+      n = new G.Node($el, 1)
+      n.allowsForA(childName)
+    
+    ancestorThatAllowsForA = ($el, childName) ->
+      if allowsForA($el, childName)
+        allowsForA($el, childName)
+      # If we're a para then look up the parent chain
+      else
+        allowsForA($el.parent(), childName)
+
     ed.onInit.add (ed, cm, n) ->
       # Use the TinyMCE document so wrap all jquery selector calls with the editor doc
       $ = mkJQuery()
@@ -63,6 +76,10 @@ tinymce.create 'tinymce.plugins.BlockishSelectionPlugin',
         console.log "node Change!"
         console.log ed.selection.getRng()
         $el = $(el)
+        # Handle the <br/> tag as a special case
+        if $el.attr('data-mce-bogus')
+          $el = $($el.parent())
+        
         if $el.hasClass 'empty'
           # TODO select all the text but not the element
           # See http://www.tinymce.com/wiki.php/API3:method.tinymce.dom.Selection.getRng and setRng
@@ -75,28 +92,34 @@ tinymce.create 'tinymce.plugins.BlockishSelectionPlugin',
 
           # Always select all text in the "empty" node
           ed.selection.select el
+        
+        # Enable/Disable all the buttons
+        for name in G.AllElements
+          cm.setDisabled(name, true)
+          if ancestorThatAllowsForA($el, name)
+            cm.setDisabled(name, false)
 
-      ###
-      ed.onKeyPress.add (ed, evt) ->
-        console.log "on Change!"
-        el = ed.selection.getNode()
-        $el = $(el)
-        if $el.hasClass 'empty'
-          # TODO select all the text but not the element
-          # See http://www.tinymce.com/wiki.php/API3:method.tinymce.dom.Selection.getRng and setRng
-          range = ed.selection.getRng()
-          text = range.commonAncestorContainer.textContent
+    ###
+    ed.onKeyPress.add (ed, evt) ->
+      console.log "on Change!"
+      el = ed.selection.getNode()
+      $el = $(el)
+      if $el.hasClass 'empty'
+        # TODO select all the text but not the element
+        # See http://www.tinymce.com/wiki.php/API3:method.tinymce.dom.Selection.getRng and setRng
+        range = ed.selection.getRng()
+        text = range.commonAncestorContainer.textContent
 
-          # Discard the "Empty" span (since a keypress occurred)
-          #$el.parent().text(text)
-          ed.selection.setNode($el.parent().get(0))
-          $el.remove()
-      ###
+        # Discard the "Empty" span (since a keypress occurred)
+        #$el.parent().text(text)
+        ed.selection.setNode($el.parent().get(0))
+        $el.remove()
+    ###
       
     ed.onBeforeRenderUI.add () ->
       # Use the TinyMCE document so wrap all jquery selector calls with the editor doc
       $ = mkJQuery()
-
+      
       buildTemplate = (name) ->
         emptyPlaceholder = (tag, title) ->
           # Jquery seems to  strip space when creating elements and the space is needed so when
@@ -111,12 +134,12 @@ tinymce.create 'tinymce.plugins.BlockishSelectionPlugin',
           when 'caption' then $el = emptyPlaceholder(tag, '[Caption]').addClass(name)
           when 'para' then $el = emptyPlaceholder(tag, '...').addClass(name)
           else
-            $el = $("<#{ tag }/>").addClass(name)
+            $el = $("<#{ tag } itemtype='#{ name }'/>").addClass(name)
         # Append all the necessary child elements
         for child in G.Rules[name].templateChildren()
           $el.append buildTemplate(child)
         $el
-      
+
       for name in G.AllElements
         console.log "mce-#{ name }"
         # Wrap in a function so the vars are bound in a closure (like name)
@@ -126,6 +149,14 @@ tinymce.create 'tinymce.plugins.BlockishSelectionPlugin',
             $template = buildTemplate(name)
             context = ed.selection.getNode()
             $context = $(context)
+
+            # Handle the <br/> tag as a special case
+            if $context.attr('data-mce-bogus')
+              $context = $($context.parent())
+            
+            # Don't always insert it right after. Sometimes we need to inject it into an ancestor (ie titles)
+            if ancestorThatAllowsForA($context, name)
+              $template.prepend(ancestorThatAllowsForA($context, name))
             $template.insertAfter($context)
             
             # If the context is empty then just remove it

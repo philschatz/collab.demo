@@ -15,21 +15,25 @@ This file will also need to:
 
 ###
 
+G = {}
+
 # Optional elements that are auto-inserted when a new template is created
 AUTO_INSERTED = [
-  'title', 'caption',
+#  'title', 'label',
+  'caption',
   'problem', 'solution',
   'statement', 'proof',
   'item', 'para'
 ]
 
 # A mapping of element name to its Rule tree
-RULES = { }
+G.Rules = { }
+G.Root = '_root'
 
 populate = (elements, rule) ->
   # console.log elements
   for name in elements
-    RULES[name] = rule
+    G.Rules[name] = rule
 
 class Rule
   supports: (name) ->
@@ -52,12 +56,13 @@ class Terminal extends Rule
   isValid: (node) ->
     return @name == node.name
   consumeChildren: (childNodes) ->
-    child = childNodes[0]
-    if @name == child.name
-      # Check if it's children are valid
-      rule = RULES[@name]
-      rule.consumeChildren child.children
-      childNodes.splice(0, 1) if child.children.length == 0
+    if childNodes.length != 0
+      child = childNodes[0]
+      if @name == child #PHIL .name
+        # Check if it's children are valid
+        # PHIL: Don't recursively consume children: rule = G.Rules[@name]
+        # PHIL: Don't recursively consume children: rule.consumeChildren child.children
+        childNodes.splice(0, 1) # PHIL: Don't recursively consume children: if child.children.length == 0
 
 class Opt extends Terminal
 
@@ -102,6 +107,9 @@ class One extends Opt
     @rule.children()
   consumeChildren: (childNodes) ->
     # The loops are flipped from the "Or" rule so the sequence is preserved
+    if not childNodes
+      console.log ""
+      console.log "SIOUSRER"
     for child in childNodes
       @rule.consumeChildren childNodes
 
@@ -147,6 +155,7 @@ populate([ 'preformat', 'title', 'label', 'span', 'cite', 'cite-title', 'link', 
 # Rules that only apply to only 1 element
 # ----------------------------------------
 
+populate([ G.Root ], ANY_BLOCK)
 populate([ 'glossary' ],	new One( 'definition' ) )
 populate([ 'definition' ],	new Seq([ new Opt( 'label' ), 'term', new Or([ 'seealso', new One( 'meaning', new Zero( 'example' ) ), new Opt( 'seealso' ) ]) ]) )
 populate([ 'seealso' ],	new Seq([ new Opt( 'label' ), new One( 'term' ) ]) )
@@ -167,7 +176,8 @@ populate([ 'equation' ],	new Seq([ LABEL_TITLE, new Or([ 'media' ]) ]) )
 
 
 # Figure out what each cnxml element maps to in HTML
-HTML_ELEMENTS_INVERTED =
+G.Elements_INVERTED =
+  body: [ G.Root ]
   div: [ 'note', 'div', 'footnote', 'meaning', 'commentary', 'section', 'example', 'exercise', 'problem', 'solution', 'statement', 'proof', 'code', 'rule', 'equation' ]
   span: [ 'preformat', 'term', 'foreign', 'cite', 'span', 'cite-title', 'caption', 'seealso', 'label' ]
   dl: ['glossary']
@@ -183,44 +193,62 @@ HTML_ELEMENTS_INVERTED =
   li: ['item']
   h1: ['title', 'label']
   figure: ['figure', 'subfigure']
-HTML_ELEMENTS = {}
-for key, values of HTML_ELEMENTS_INVERTED
+G.Elements = {}
+for key, values of G.Elements_INVERTED
   for value in values
-    HTML_ELEMENTS[value] = key
+    G.Elements[value] = key
 
-ELEMENTS = (x for x, _ of RULES)
+G.AllElements = (x for x, _ of G.Rules)
 
 
 # Given an HTML element look up 
 htmlToElement = ($el) ->
-  tag = $el.get(0).tagName
-  if tag in HTML_ELEMENTS_INVERTED
-    if HTML_ELEMENTS_INVERTED[tag].length == 1
+  tag = $el.get(0).tagName.toLowerCase()
+  if tag of G.Elements_INVERTED
+    if G.Elements_INVERTED[tag].length == 1
       # Only one element maps to it. no need to check the class name
-      HTML_ELEMENTS_INVERTED[tag]
+      G.Elements_INVERTED[tag][0]
     else
       # Match on class name
-      for name in HTML_ELEMENTS_INVERTED[tag]
+      for name in G.Elements_INVERTED[tag]
         return name if $el.hasClass name
   else
+    console.log "Could not parse a #{tag}"
     null
 
 # Builds a tree out of the HTML so we can validate the tag structure
-class Node
-  constructor: (@name = null, @children = []) ->
-  parseHtml: (@$el) ->
+class G.Node
+  constructor: ($el, depth = -1, @name = null, @children = []) ->
+    @parseHtml($el, depth) if $el
+  parseHtml: (@$el, depth = -1) ->
     @name = htmlToElement @$el
-    for child in @$el.children()
-      n = new Node()
-      n.parseHtml child
-      @children.push n
+    if @name
+      if depth != 0
+        for child in @$el.children()
+          n = new G.Node()
+          n.parseHtml $(child), (depth == -1 ? -1 : depth - 1)
+          if n.name
+            @children.push n
+
+  # Checks if an element of type "name" can be inserted into the node
+  allowsForA: (name) ->
+    if @name and @children
+      # Build up a list of just the names of child elements
+      children = (child.name for child in @children)
+      
+      # Inject the element we want to test
+      # HACK: for titles and labels inject them in the beginning
+      switch name
+        when 'title' then children.splice(0, 0, name)
+        when 'label' then children.splice(0, 0, name)
+        else children.push(name)
+      G.Rules[@name].consumeChildren(children)
+      children.length == 0
+      
 
 if window?
   window.Cnx = window.Cnx or { }
-  window.Cnx.Grammar =
-    AllElements: ELEMENTS
-    Rules: RULES
-    Elements: HTML_ELEMENTS
+  window.Cnx.Grammar = G
 
 else
   # Run the tests when run from the commandline
@@ -228,25 +256,25 @@ else
   console.log "Which elements will be autogenerated (optional/required)"
   console.log "  when a new element of this type is created?"
   console.log "---------------------------------------------"
-  for key, rule of RULES
+  for key, rule of G.Rules
     console.log "(Debug) Rule: #{key}: #{rule.templateChildren()}"
 
   console.log "---------------------------------------------"
   console.log "What are all the possible children of this element?"
   console.log "---------------------------------------------"
-  for key, rule of RULES
+  for key, rule of G.Rules
     console.log "(Debug) Rule: #{key}: #{rule.children()}"
   
   console.log "---------------------------------------------"
   console.log "Some unit tests on the grammar."
   console.log "---------------------------------------------"
-  n = new Node('list', [ new Node('item'), new Node('item') ])
-  rule = RULES[n.name]
+  n = new G.Node('list', [ new G.Node('item'), new G.Node('item') ])
+  rule = G.Rules[n.name]
   rule.consumeChildren n.children
   console.log "Expected: 0   Got: #{ n.children.length }"
 
-  n = new Node('list', [ new Node('item'), new Node('term') ])
-  rule = RULES[n.name]
+  n = new G.Node('list', [ new G.Node('item'), new G.Node('term') ])
+  rule = G.Rules[n.name]
   rule.consumeChildren n.children
   console.log "Expected: 1   Got: #{ n.children.length }"
 
@@ -265,22 +293,22 @@ else
   #
   # As another example, a section with a title and a subsection could _not_
   #   be upconverted to a note. 
-  for element in ELEMENTS
-    #console.log "#{element}.children = #{RULES[element].children()}"
-    for el2 in ELEMENTS
+  for element in G.AllElements
+    #console.log "#{element}.children = #{G.Rules[element].children()}"
+    for el2 in G.AllElements
       if element != el2
         # Compare all the possiblle children.
         # If one is a subset of the other record that
         flag = false
-        for child in RULES[element].children()
-          if child not in RULES[el2].children()
+        for child in G.Rules[element].children()
+          if child not in G.Rules[el2].children()
             flag = true
         if not flag
           invalidParents = []
           validParents = []
-          for parent in ELEMENTS
-            if element in RULES[parent].children()
-              if el2 in RULES[parent].children()
+          for parent in G.AllElements
+            if element in G.Rules[parent].children()
+              if el2 in G.Rules[parent].children()
                 validParents.push(parent)
               else
                 invalidParents.push(parent)
