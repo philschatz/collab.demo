@@ -15,5 +15,9 @@ tinyMCE.init({
         theme_advanced_toolbar_location : "top",
         theme_advanced_statusbar_location : "bottom",
 
+        // added pbrian - just to look half decent size
+        width : "640",
+        height: "480",
+
 });
 
