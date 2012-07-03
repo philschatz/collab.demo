@@ -28,11 +28,9 @@ span.empty {
     .x-block () {
       padding: 0.1em 0.5em 0.5em @left-padding;
       margin: 0.25em;
-      border-left-width: 0.25em;
-      border-left-style: solid;
+      border-left-width: 0em;
       border-right-width: 0.25em;
       border-right-style: solid;
-      border-radius: 8px;
       //opacity: 0.8;
       &::before {
         .x-block-title;
@@ -63,6 +61,30 @@ span.empty {
       counter-increment: @counter-name;
       border-color: @border;
       background: @background;
+      
+      position: relative;
+      
+      .handle {
+        @shift: 1em;
+        position: absolute;
+        left: -@shift;
+        top: 0px;
+        bottom: 1px;
+        width: @shift;
+        background: #747260;
+        opacity: 0.1;
+        cursor: pointer;
+      }
+    
+      &:hover > .handle {
+        background: #747260;
+        opacity: 0.3;
+      }
+    
+      &.selected > .handle {
+        opacity: 1.0;
+      }
+
     }
 
     .note { .x-blockish("Note: ", note, #52E052, #E9FBE9); }

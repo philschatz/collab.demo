@@ -2,7 +2,7 @@
 
   tinymce.create('tinymce.plugins.BlockishSelectionPlugin', {
     init: function(ed, url) {
-      var G, allowsForA, ancestorThatAllowsForA, mkJQuery;
+      var G, allowsForA, ancestorAllowsForA, mkJQuery;
       G = Cnx.Grammar;
       mkJQuery = function() {
         return function(selector) {
@@ -23,10 +23,11 @@
         n = new G.Node($el, 1);
         return n.allowsForA(childName);
       };
-      ancestorThatAllowsForA = function($el, childName) {
-        if (allowsForA($el, childName)) {
-          return allowsForA($el, childName);
-        } else {
+      ancestorAllowsForA = function($el, childName) {
+        var allows;
+        allows = allowsForA($el, childName);
+        if (allows != null) return allows;
+        if ($el.parent() && $el.parent().parent()) {
           return allowsForA($el.parent(), childName);
         }
       };
@@ -70,7 +71,7 @@
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             name = _ref[_i];
             cm.setDisabled(name, true);
-            if (ancestorThatAllowsForA($el, name)) {
+            if (ancestorAllowsForA($el, name)) {
               _results.push(cm.setDisabled(name, false));
             } else {
               _results.push(void 0);
@@ -118,7 +119,14 @@
               $el = emptyPlaceholder(tag, '...').addClass(name);
               break;
             default:
-              $el = $("<" + tag + " itemtype='" + name + "'/>").addClass(name);
+              $el = $("<" + tag + " itemtype='" + name + "'/>").addClass(name).draggable({
+                handle: '.handle',
+                start: function() {
+                  return console.log("Started dragging");
+                }
+              });
+              console.log($);
+              $("<div class='handle'/>").appendTo($el);
           }
           _ref = G.Rules[name].templateChildren();
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -134,14 +142,14 @@
           console.log("mce-" + name);
           f = function(name) {
             return ed.addCommand("mce-" + name, function() {
-              var $context, $template, context, hasContent;
+              var $context, $template, context, dropConf, hasContent;
               console.log("Executing command mce-" + name);
               $template = buildTemplate(name);
               context = ed.selection.getNode();
               $context = $(context);
               if ($context.attr('data-mce-bogus')) $context = $($context.parent());
-              if (ancestorThatAllowsForA($context, name)) {
-                $template.prepend(ancestorThatAllowsForA($context, name));
+              if (ancestorAllowsForA($context, name)) {
+                $template.prepend(ancestorAllowsForA($context, name));
               }
               $template.insertAfter($context);
               hasContent = $context.children("*:not([data-mce-bogus],.empty)").length > 0 || $context.text().length > 0;
@@ -149,8 +157,14 @@
                 $context.remove();
               }
               if ($template.get(0).tagName.toLowerCase() === 'div') {
-                $("<p class='cursor before'>&#160;</p>").insertBefore($template);
-                $("<p class='cursor after'>&#160;</p>").insertAfter($template);
+                dropConf = {
+                  drop: function(event, ui) {
+                    console.log(event);
+                    return $(this).replaceWith(event);
+                  }
+                };
+                $("<p class='cursor before'>&#160;</p>").insertBefore($template).droppable(dropConf);
+                $("<p class='cursor after'>&#160;</p>").insertAfter($template).droppable(dropConf);
               }
               return null;
             });

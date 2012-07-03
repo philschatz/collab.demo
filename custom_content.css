@@ -14,11 +14,9 @@
 .mceContentBody section, .mceContentBody .section {
   padding: 0.1em 0.5em 0.5em 0.5em;
   margin: 0.25em;
-  border-left-width: 0.25em;
-  border-left-style: solid;
+  border-left-width: 0em;
   border-right-width: 0.25em;
   border-right-style: solid;
-  border-radius: 8px;
   counter-increment: section;
   border-color: #cccccc;
 }
@@ -39,14 +37,13 @@
 .mceContentBody .note {
   padding: 0.1em 0.5em 0.5em 0.5em;
   margin: 0.25em;
-  border-left-width: 0.25em;
-  border-left-style: solid;
+  border-left-width: 0em;
   border-right-width: 0.25em;
   border-right-style: solid;
-  border-radius: 8px;
   counter-increment: note;
   border-color: #52e052;
   background: #e9fbe9;
+  position: relative;
 }
 .mceContentBody .note::before {
   float: left;
@@ -58,17 +55,33 @@
 .mceContentBody .note::before {
   content: "Note: ";
 }
+.mceContentBody .note .handle {
+  position: absolute;
+  left: -1em;
+  top: 0px;
+  bottom: 1px;
+  width: 1em;
+  background: #747260;
+  opacity: 0.1;
+  cursor: pointer;
+}
+.mceContentBody .note:hover > .handle {
+  background: #747260;
+  opacity: 0.3;
+}
+.mceContentBody .note.selected > .handle {
+  opacity: 1.0;
+}
 .mceContentBody .example {
   padding: 0.1em 0.5em 0.5em 0.5em;
   margin: 0.25em;
-  border-left-width: 0.25em;
-  border-left-style: solid;
+  border-left-width: 0em;
   border-right-width: 0.25em;
   border-right-style: solid;
-  border-radius: 8px;
   counter-increment: example;
   border-color: #8ccbf2;
   background: #ddeeff;
+  position: relative;
 }
 .mceContentBody .example::before {
   float: left;
@@ -80,17 +93,33 @@
 .mceContentBody .example::before {
   content: "Example " counter(example) ": ";
 }
+.mceContentBody .example .handle {
+  position: absolute;
+  left: -1em;
+  top: 0px;
+  bottom: 1px;
+  width: 1em;
+  background: #747260;
+  opacity: 0.1;
+  cursor: pointer;
+}
+.mceContentBody .example:hover > .handle {
+  background: #747260;
+  opacity: 0.3;
+}
+.mceContentBody .example.selected > .handle {
+  opacity: 1.0;
+}
 .mceContentBody .exercise {
   padding: 0.1em 0.5em 0.5em 0.5em;
   margin: 0.25em;
-  border-left-width: 0.25em;
-  border-left-style: solid;
+  border-left-width: 0em;
   border-right-width: 0.25em;
   border-right-style: solid;
-  border-radius: 8px;
   counter-increment: exercise;
   border-color: #e0cb52;
   background: #fcfaee;
+  position: relative;
 }
 .mceContentBody .exercise::before {
   float: left;
@@ -102,17 +131,33 @@
 .mceContentBody .exercise::before {
   content: "Exercise " counter(exercise) ": ";
 }
+.mceContentBody .exercise .handle {
+  position: absolute;
+  left: -1em;
+  top: 0px;
+  bottom: 1px;
+  width: 1em;
+  background: #747260;
+  opacity: 0.1;
+  cursor: pointer;
+}
+.mceContentBody .exercise:hover > .handle {
+  background: #747260;
+  opacity: 0.3;
+}
+.mceContentBody .exercise.selected > .handle {
+  opacity: 1.0;
+}
 .mceContentBody .figure {
   padding: 0.1em 0.5em 0.5em 0.5em;
   margin: 0.25em;
-  border-left-width: 0.25em;
-  border-left-style: solid;
+  border-left-width: 0em;
   border-right-width: 0.25em;
   border-right-style: solid;
-  border-radius: 8px;
   counter-increment: figure;
   border-color: #e0cb52;
   background: #fcfaee;
+  position: relative;
 }
 .mceContentBody .figure::before {
   float: left;
@@ -124,14 +169,29 @@
 .mceContentBody .figure::before {
   content: "Figure " counter(figure) ": ";
 }
+.mceContentBody .figure .handle {
+  position: absolute;
+  left: -1em;
+  top: 0px;
+  bottom: 1px;
+  width: 1em;
+  background: #747260;
+  opacity: 0.1;
+  cursor: pointer;
+}
+.mceContentBody .figure:hover > .handle {
+  background: #747260;
+  opacity: 0.3;
+}
+.mceContentBody .figure.selected > .handle {
+  opacity: 1.0;
+}
 .mceContentBody .solution:not(.empty) {
   padding: 0.1em 0.5em 0.5em 0.5em;
   margin: 0.25em;
-  border-left-width: 0.25em;
-  border-left-style: solid;
+  border-left-width: 0em;
   border-right-width: 0.25em;
   border-right-style: solid;
-  border-radius: 8px;
   border-color: #cccccc;
 }
 .mceContentBody .solution:not(.empty)::before {
@@ -148,11 +208,9 @@
 .mceContentBody .problem:not(.empty) {
   padding: 0.1em 0.5em 0.5em 0.5em;
   margin: 0.25em;
-  border-left-width: 0.25em;
-  border-left-style: solid;
+  border-left-width: 0em;
   border-right-width: 0.25em;
   border-right-style: solid;
-  border-radius: 8px;
   border-color: #cccccc;
 }
 .mceContentBody .problem:not(.empty)::before {

@@ -264,6 +264,16 @@ else
   console.log "---------------------------------------------"
   for key, rule of G.Rules
     console.log "(Debug) Rule: #{key}: #{rule.children()}"
+
+  console.log "---------------------------------------------"
+  console.log "What are all the possible parents of this element?"
+  console.log "---------------------------------------------"
+  for key, _ of G.Rules
+    parents = []
+    for key2, rule of G.Rules
+      if key in rule.children()
+        parents.push key2
+    console.log "(Debug) Rule: #{key}: #{parents}"
   
   console.log "---------------------------------------------"
   console.log "Some unit tests on the grammar."

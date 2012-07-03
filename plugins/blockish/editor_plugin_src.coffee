@@ -23,11 +23,12 @@ tinymce.create 'tinymce.plugins.BlockishSelectionPlugin',
       n = new G.Node($el, 1)
       n.allowsForA(childName)
     
-    ancestorThatAllowsForA = ($el, childName) ->
-      if allowsForA($el, childName)
-        allowsForA($el, childName)
+    ancestorAllowsForA = ($el, childName) ->
+      allows = allowsForA($el, childName)
+      return allows if allows?
+      
       # If we're a para then look up the parent chain
-      else
+      if $el.parent() and $el.parent().parent()
         allowsForA($el.parent(), childName)
 
     ed.onInit.add (ed, cm, n) ->
@@ -96,7 +97,7 @@ tinymce.create 'tinymce.plugins.BlockishSelectionPlugin',
         # Enable/Disable all the buttons
         for name in G.AllElements
           cm.setDisabled(name, true)
-          if ancestorThatAllowsForA($el, name)
+          if ancestorAllowsForA($el, name)
             cm.setDisabled(name, false)
 
     ###
@@ -134,7 +135,14 @@ tinymce.create 'tinymce.plugins.BlockishSelectionPlugin',
           when 'caption' then $el = emptyPlaceholder(tag, '[Caption]').addClass(name)
           when 'para' then $el = emptyPlaceholder(tag, '...').addClass(name)
           else
-            $el = $("<#{ tag } itemtype='#{ name }'/>").addClass(name)
+            $el = $("<#{ tag } itemtype='#{ name }'/>").addClass(name).draggable(
+              handle: '.handle',
+              start: () -> console.log "Started dragging"
+            )
+            console.log($)
+            # Append a "handle" element for dragging since it's blockish?
+            $("<div class='handle'/>").appendTo($el)
+        
         # Append all the necessary child elements
         for child in G.Rules[name].templateChildren()
           $el.append buildTemplate(child)
@@ -155,8 +163,8 @@ tinymce.create 'tinymce.plugins.BlockishSelectionPlugin',
               $context = $($context.parent())
             
             # Don't always insert it right after. Sometimes we need to inject it into an ancestor (ie titles)
-            if ancestorThatAllowsForA($context, name)
-              $template.prepend(ancestorThatAllowsForA($context, name))
+            if ancestorAllowsForA($context, name)
+              $template.prepend(ancestorAllowsForA($context, name))
             $template.insertAfter($context)
             
             # If the context is empty then just remove it
@@ -171,8 +179,12 @@ tinymce.create 'tinymce.plugins.BlockishSelectionPlugin',
             
             # Insert para's that allow the user to select before and after one of these blockish pieces
             if $template.get(0).tagName.toLowerCase() == 'div'
-              $("<p class='cursor before'>&#160;</p>").insertBefore($template)
-              $("<p class='cursor after'>&#160;</p>").insertAfter($template)
+              dropConf =
+                drop: (event, ui) ->
+                  console.log event
+                  $(this).replaceWith(event)
+              $("<p class='cursor before'>&#160;</p>").insertBefore($template).droppable(dropConf)
+              $("<p class='cursor after'>&#160;</p>").insertAfter($template).droppable(dropConf)
             
             null # Return null otherwise TinyMCE will try to re-add the element
         f(name)
