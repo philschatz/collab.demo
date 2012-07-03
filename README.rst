@@ -1,5 +1,10 @@
-oerpub wysiwyg editor
+===============
+ What is This?
+===============
 
+Educational content doesn't quite match the HTML model (especially educational books).
+For example, HTML has no notion of glossary terms and definitions, exercise problems and solutions, equations, etc.
 
+This editor provides a WYSIWYG way of editing such material.
 
-( Marvin: My documentation on how to get this working https://docs.google.com/document/d/1lehrnQdjq9DQ7Pqi1sksmxB_l9x-3b3ztVrKVkQ3cDg/edit )
+Under the hood it uses http://aloha-editor.org
