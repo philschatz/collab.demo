@@ -32,7 +32,6 @@ Aloha.ready ->
   $context = Aloha.jQuery("<div class=\"context-cursor\"/>").appendTo($overlay)
   $icon = Aloha.jQuery("<div class=\"context-icon\">&#160;^</div>").hide().appendTo($context)
   $menu = Aloha.jQuery("<div class=\"context-menu\"/>").hide().appendTo($context)
-
   # These are the semanticly rich buttons
   buttons = [
     title: "Term"
