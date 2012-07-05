@@ -1,5 +1,4 @@
 (function() {
-  var $handle, dragScope, f, i;
 
   Aloha.ready(function() {
     /*
@@ -8,7 +7,7 @@
     /*
        Also, has code for supporting drag-and-drop handles
     */
-    var $context, $document, $icon, $menu, $overlay, buttons, getSelectionRect, showContext;
+    var $cmd, $context, $document, $handle, $icon, $menu, $overlay, buttons, cmd, dragScope, getSelectionRect, showContext, _i, _len;
     getSelectionRect = function(rangeObject) {
       if (!rangeObject.getStartDocumentPos) {
         console.error("Couldn't call getStartDocumentPos on rangy (wrong ver of rangy and proper plugins not installed");
@@ -37,37 +36,33 @@
     $context = Aloha.jQuery("<div class=\"context-cursor\"/>").appendTo($overlay);
     $icon = Aloha.jQuery("<div class=\"context-icon\">&#160;^</div>").hide().appendTo($context);
     $menu = Aloha.jQuery("<div class=\"context-menu\"/>").hide().appendTo($context);
-
-var buttons = [
-      {
-        title: "Term",
-        command: "cmd-term",
-        markup: "<span class=\"term\"/>",
-        shortcut: "ctrl+shift+t"
-      }, {
-        title: "Note",
-        command: "cmd-note",
-        markup: "<span class=\"note\"/>",
-        shortcut: "ctrl+shift+n"
-      }, {
-        title: "Quote",
-        command: "cmd-quote",
-        markup: "<q />",
-        shortcut: "ctrl+shift+q"
-      }, {
-        title: "Footnote",
-        command: "cmd-footnote",
-        markup: "<span class=\"footnote\"/>",
-        shortcut: "ctrl+shift+f"
-      }
-    ];
-
-  i = 0;
-
-  while (i < buttons.length) {
-    f = function() {
-      var $cmd, cmd;
-      cmd = buttons[i];
+    buttons = [];
+    buttons.push({
+      title: "Term",
+      command: "cmd-term",
+      markup: "<span class=\"term\"/>",
+      shortcut: "ctrl+shift+t"
+    });
+    buttons.push({
+      title: "Note",
+      command: "cmd-note",
+      markup: "<span class=\"note\"/>",
+      shortcut: "ctrl+shift+n"
+    });
+    buttons.push({
+      title: "Quote",
+      command: "cmd-quote",
+      markup: "<q />",
+      shortcut: "ctrl+shift+q"
+    });
+    buttons.push({
+      title: "Footnote",
+      command: "cmd-footnote",
+      markup: "<span class=\"footnote\"/>",
+      shortcut: "ctrl+shift+f"
+    });
+    for (_i = 0, _len = buttons.length; _i < _len; _i++) {
+      cmd = buttons[_i];
       $cmd = Aloha.jQuery("<div href=\"#\" title=\"" + cmd.title + " (" + cmd.shortcut + ")\" class=\"command " + cmd.command + "\" command=\"" + cmd.command + "\"><span>" + cmd.title + "</span></div>");
       $cmd.click(function() {
         var markup, rangeObject;
@@ -76,73 +71,66 @@ var buttons = [
         if (rangeObject.isCollapsed()) GENTICS.Utils.Dom.extendToWord(rangeObject);
         return Aloha.Selection.changeMarkupOnSelection(Aloha.jQuery(markup));
       });
-      return $cmd.appendTo($menu);
-    };
-    f();
-    i++;
-  }
-
-  $icon.bind("click", function(evt) {
-    evt.stopPropagation();
-    $menu.show();
-    return $overlay.click(function() {
-      $menu.hide();
-      return $icon.hide();
+      $cmd.appendTo($menu);
+    }
+    $icon.bind("click", function(evt) {
+      evt.stopPropagation();
+      $menu.show();
+      return $overlay.click(function() {
+        $menu.hide();
+        return $icon.hide();
+      });
+    });
+    $handle = Aloha.jQuery("<div class=\"handle\" contenteditable=\"false\"></div>").hide().appendTo("body");
+    Aloha.bind("aloha-selection-changed", function(event, rangeObject) {
+      var $end, $start, css, end, range, ranges, sel, start;
+      sel = rangy.getSelection();
+      ranges = sel.getAllRanges();
+      if (ranges.length === 0) return;
+      range = rangeObject;
+      start = range.startContainer;
+      end = range.endContainer;
+      if (rangeObject.getStartDocumentPos) {
+        showContext(rangeObject);
+      } else {
+        console.warn("Not displaying context icon because rangy is missing the rangy-position plugin for pixel-calculation of cursor position");
+        $icon.hide();
+      }
+      $start = Aloha.jQuery(start).parent("h1,h2,h3,h4,h5,h6,p");
+      $end = Aloha.jQuery(end).parent("h1,h2,h3,h4,h5,h6,p");
+      css = {};
+      if ($start.offset()) {
+        css.top = $start.offset().top;
+        css.height = $end.offset().top + $end.height() - css.top;
+        $handle.data({
+          node: $start
+        });
+        return $handle.css(css).show();
+      } else {
+        return $handle.hide();
+      }
+    });
+    dragScope = "blockish-nodes-only";
+    return $handle.draggable({
+      scope: dragScope,
+      revert: "invalid",
+      cursor: "move",
+      start: function(el) {
+        var $blocks;
+        $blocks = $document.find("h1,h2,h3,h4,h5,h6,p");
+        return $blocks.droppable({
+          scope: dragScope,
+          hoverClass: "drop-before",
+          drop: function(event, ui) {
+            ui.draggable.data("node").insertBefore(Aloha.jQuery(this));
+            return ui.draggable.attr("style", "");
+          }
+        });
+      }
     });
   });
 
-  $handle = Aloha.jQuery("<div class=\"handle\" contenteditable=\"false\"></div>").hide().appendTo("body");
-
-  Aloha.bind("aloha-selection-changed", function(event, rangeObject) {
-    var $end, $start, css, end, range, ranges, sel, start;
-    sel = rangy.getSelection();
-    ranges = sel.getAllRanges();
-    if (ranges.length === 0) return;
-    range = rangeObject;
-    start = range.startContainer;
-    end = range.endContainer;
-    if (rangeObject.getStartDocumentPos) {
-      showContext(rangeObject);
-    } else {
-      console.warn("Not displaying context icon because rangy is missing the rangy-position plugin for pixel-calculation of cursor position");
-      $icon.hide();
-    }
-    $start = Aloha.jQuery(start).parent("h1,h2,h3,h4,h5,h6,p");
-    $end = Aloha.jQuery(end).parent("h1,h2,h3,h4,h5,h6,p");
-    css = {};
-    if ($start.offset()) {
-      css.top = $start.offset().top;
-      css.height = $end.offset().top + $end.height() - css.top;
-      $handle.data({
-        node: $start
-      });
-      return $handle.css(css).show();
-    } else {
-      return $handle.hide();
-    }
-  });
-
-  dragScope = "blockish-nodes-only";
-
-  $handle.draggable({
-    scope: dragScope,
-    revert: "invalid",
-    cursor: "move",
-    start: function(el) {
-      var $blocks;
-      $blocks = $document.find("h1,h2,h3,h4,h5,h6,p");
-      return $blocks.droppable({
-        scope: dragScope,
-        hoverClass: "drop-before",
-        drop: function(event, ui) {
-          ui.draggable.data("node").insertBefore(Aloha.jQuery(this));
-          return ui.draggable.attr("style", "");
-        }
-      });
-    }
-  });
-
-
+  Aloha.ready(function() {
     Aloha.jQuery("<script src=\"./lib/jquery-ui.min.js\"></script>").appendTo("body");
     return Aloha.jQuery(".document").aloha();
   });

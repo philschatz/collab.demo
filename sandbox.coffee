@@ -33,43 +33,37 @@ Aloha.ready ->
   $icon = Aloha.jQuery("<div class=\"context-icon\">&#160;^</div>").hide().appendTo($context)
   $menu = Aloha.jQuery("<div class=\"context-menu\"/>").hide().appendTo($context)
   # These are the semanticly rich buttons
-  buttons = [
+  buttons = []
+  buttons.push
     title: "Term"
     command: "cmd-term"
     markup: "<span class=\"term\"/>"
     shortcut: "ctrl+shift+t"
-  ,
+  buttons.push
     title: "Note"
     command: "cmd-note"
     markup: "<span class=\"note\"/>"
     shortcut: "ctrl+shift+n"
-  ,
+  buttons.push
     title: "Quote"
     command: "cmd-quote"
     markup: "<q />"
     shortcut: "ctrl+shift+q"
-  ,
+  buttons.push
     title: "Footnote"
     command: "cmd-footnote"
     markup: "<span class=\"footnote\"/>"
     shortcut: "ctrl+shift+f"
-   ]
-  i = 0
+  for cmd in buttons
+    $cmd = Aloha.jQuery("<div href=\"#\" title=\"" + cmd.title + " (" + cmd.shortcut + ")\" class=\"command " + cmd.command + "\" command=\"" + cmd.command + "\"><span>" + cmd.title + "</span></div>")
+    $cmd.click ->
+      markup = jQuery(cmd.markup)
+      rangeObject = Aloha.Selection.rangeObject
+      GENTICS.Utils.Dom.extendToWord rangeObject  if rangeObject.isCollapsed()
+      Aloha.Selection.changeMarkupOnSelection Aloha.jQuery(markup)
+  
+    $cmd.appendTo $menu
 
-  while i < buttons.length
-    f = ->
-      cmd = buttons[i]
-      $cmd = Aloha.jQuery("<div href=\"#\" title=\"" + cmd.title + " (" + cmd.shortcut + ")\" class=\"command " + cmd.command + "\" command=\"" + cmd.command + "\"><span>" + cmd.title + "</span></div>")
-      $cmd.click ->
-        markup = jQuery(cmd.markup)
-        rangeObject = Aloha.Selection.rangeObject
-        GENTICS.Utils.Dom.extendToWord rangeObject  if rangeObject.isCollapsed()
-        Aloha.Selection.changeMarkupOnSelection Aloha.jQuery(markup)
-
-      $cmd.appendTo $menu
-
-    f()
-    i++
   $icon.bind "click", (evt) ->
     evt.stopPropagation() # Stop propagation so the editor doesn't lose focus
     $menu.show()
