@@ -37,8 +37,7 @@
     $context = Aloha.jQuery("<div class=\"context-cursor\"/>").appendTo($overlay);
     $icon = Aloha.jQuery("<div class=\"context-icon\">&#160;^</div>").hide().appendTo($context);
     $menu = Aloha.jQuery("<div class=\"context-menu\"/>").hide().appendTo($context);
-
-var buttons = [
+    return buttons = [
       {
         title: "Term",
         command: "cmd-term",
@@ -61,6 +60,7 @@ var buttons = [
         shortcut: "ctrl+shift+f"
       }
     ];
+  });
 
   i = 0;
 
@@ -142,7 +142,7 @@ var buttons = [
     }
   });
 
-
+  Aloha.ready(function() {
     Aloha.jQuery("<script src=\"./lib/jquery-ui.min.js\"></script>").appendTo("body");
     return Aloha.jQuery(".document").aloha();
   });
