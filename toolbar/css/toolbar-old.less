@@ -1,0 +1,39 @@
+.toolbar {
+  width: 100%;
+  background-color: whiteSmoke;
+  border-top: 1px solid #E5E5E5;
+  border-bottom: 1px solid #E5E5E5;
+  min-height: 30px;
+  padding: 5px;
+  padding-left: 70px;
+  padding-right: 90px;
+}
+.toolbar .button {
+  vertical-align: middle;
+  display: inline-block;
+  opacity: 0.70;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  padding: 5px;
+}
+.toolbar .button:hover {
+  opacity: 1.0;
+  border: 1px solid #ccc;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+}
+.toolbar .button.disabled { opacity: 0.3; }
+.toolbar .button.disabled:hover { border: 1px solid transparent; }
+.toolbar .button.pressed { background-color: #eee; opacity: 1.0; border: 1px solid #ccc; }
+
+
+.toolbar .button .inner {
+  width: 16px;
+  height: 16px;
+}
+
+.toolbar .button button {
+  border: 0;
+  padding: 0;
+  box-sizing: none;
+}
+

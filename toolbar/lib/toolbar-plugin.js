@@ -2,7 +2,7 @@
 
   define(["aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!format/nls/i18n", "i18n!aloha/nls/i18n", "aloha/console", "css!toolbar/css/toolbar.css"], function(Aloha, Plugin, jQuery, FloatingMenu, i18n, i18nCore) {
     var FloatingMenu_addButton, TOOLBAR_JQUERY, enabledButtons, rangeHack;
-    TOOLBAR_JQUERY = jQuery("<div class=\"toolbar\"></div>").appendTo("body");
+    TOOLBAR_JQUERY = jQuery('.toolbar') || jQuery('<div></div>').addClass('toolbar').appendTo('body');
     rangeHack = null;
     enabledButtons = ["b", "i", "s", "sub", "sup", "quote", "ul", "ol", "indent-list", "outdent-list", "insertLink", "removeLink"];
     FloatingMenu_addButton = function(scope, button, tab, group) {

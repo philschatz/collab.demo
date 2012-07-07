@@ -1,6 +1,6 @@
 define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!format/nls/i18n", "i18n!aloha/nls/i18n", "aloha/console", "css!toolbar/css/toolbar.css" ], (Aloha, Plugin, jQuery, FloatingMenu, i18n, i18nCore) ->
 
-  TOOLBAR_JQUERY = jQuery("<div class=\"toolbar\"></div>").appendTo("body")
+  TOOLBAR_JQUERY = jQuery('.toolbar') || jQuery('<div></div>').addClass('toolbar').appendTo('body')
   # Changed every time selectionChanged event is fired
   rangeHack = null
   enabledButtons = [ "b", "i", "s", "sub", "sup", "quote", "ul", "ol", "indent-list", "outdent-list", "insertLink", "removeLink" ]
