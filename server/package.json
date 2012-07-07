@@ -1,0 +1,20 @@
+{
+  "name": "oerpub.editor",
+  "description": "Document collaboration engine",
+  "version": "0.1.0",
+  "homepage": "http://oerpub.github.com/oerpub.editor",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oerpub/oerpub.editor"
+  },
+  "dependencies": {
+    "cookie-sessions": "0.0.2",
+    "express": "2.5.9",
+    "coffee-script": "1.2.0",
+    "less": "1.3.0",
+    "request": "2.9.3",
+    "socket.io": "0.9.5"
+  },
+  "devDependencies": {
+  }
+}
