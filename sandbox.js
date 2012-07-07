@@ -99,7 +99,7 @@
       $start = Aloha.jQuery(start).parent("h1,h2,h3,h4,h5,h6,p");
       $end = Aloha.jQuery(end).parent("h1,h2,h3,h4,h5,h6,p");
       css = {};
-      if ($start.offset()) {
+      if ($start.offset() !== null && $end.offset() !== null) {
         css.top = $start.offset().top;
         css.height = $end.offset().top + $end.height() - css.top;
         $handle.data({

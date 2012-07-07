@@ -48,7 +48,7 @@ span.footnote::before {
   background-color: #999;
   width: 20px;
   min-height: 1em;
-  left: 58px;
+  left: 50px;
   cursor: pointer;
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
