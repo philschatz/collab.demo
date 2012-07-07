@@ -180,6 +180,11 @@ h2::before { content: counter(section) "." counter(sub-section); }
 }
 
 
+.remote-selected {
+  cursor: default;
+  color: #ccc;
+}
+
 /***************
   Github Ribbon
 *****************/
