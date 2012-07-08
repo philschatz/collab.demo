@@ -94,10 +94,14 @@
               html: parent[0].innerHTML
             });
           } else {
-            parent = $doc.find('*:not([id])').first();
+            parent = $doc.children('*:not([id])').first();
             id = "auto-" + me.user + "-id" + (++autoId);
             html = parent[0].outerHTML;
             parent.attr('id', id);
+            socket.emit('node:update', {
+              node: parent.prev().attr('id'),
+              html: parent.prev()[0].innerHTML
+            });
             next = parent.nextAll('*[id]').first();
             if (next.length) {
               op = 'insertbefore';
@@ -106,12 +110,13 @@
               op = 'append';
               context = parent.parent();
             }
-            return socket.emit('node:operation', {
+            socket.emit('node:operation', {
               op: op,
               node: id,
               context: context.attr('id'),
               html: html
             });
+            return socket.emit('node:select', [id]);
           }
         });
       });

@@ -90,11 +90,18 @@ Aloha.ready ->
           # The user created a new element by pressing Enter
           # Either it's a insertbefore or an append message
           # Find the new node
-          parent = $doc.find('*:not([id])').first()
+
+          parent = $doc.children('*:not([id])').first()
           id = "auto-#{ me.user }-id#{ ++autoId }"
           html = parent[0].outerHTML
           parent.attr('id', id)
-          
+
+          # The user probably hit enter. so update the previous node          
+          socket.emit 'node:update',
+            node: parent.prev().attr 'id'
+            html: parent.prev()[0].innerHTML
+
+
           next = parent.nextAll('*[id]').first()
           if next.length
             op = 'insertbefore'
@@ -107,6 +114,7 @@ Aloha.ready ->
             node: id
             context: context.attr 'id'
             html: html
+          socket.emit 'node:select', [ id ]
           
   
   if io?
