@@ -129,7 +129,7 @@ module.exports = (app) ->
             replacedAnotherEdit = true
         
       if not replacedAnotherEdit
-        history.push msg
+        history.push { command: 'node:update', message: msg }
 
     # Handle disconnects by notifying everyone the user disconnected
     socket.on 'disconnect', ->

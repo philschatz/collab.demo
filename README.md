@@ -6,6 +6,8 @@ For example, HTML has no notion of glossary terms and definitions, exercise prob
 
 This editor provides a WYSIWYG way of editing such material.
 
+It is also getting support for collaborative editing.
+
 Under the hood it uses http://aloha-editor.org
 
  How can I contribute?
