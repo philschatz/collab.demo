@@ -45,7 +45,7 @@ module.exports = (app) ->
       command: 'node:operation'
       message:
         op: 'append'
-        id: "id-#{ ++populateId }"
+        node: "id-#{ ++populateId }"
         context: context
         html: outerHTML
     "id-#{ populateId }"
@@ -73,18 +73,18 @@ module.exports = (app) ->
     
     # Let the client know which user they are
     emit 'user:hello',
-      id: socket.id
+      user: socket.id
       color: color
 
     # Let everyone know this client has joined in
     socket.broadcast.emit 'user:join',
-      id: socket.id
+      user: socket.id
       color: color
 
     # Give the client a list of active users
     for user, color of sessions
       emit 'user:join',
-        id: socket.id
+        user: socket.id
         color: color
     
     # Send a history of changes
@@ -110,12 +110,12 @@ module.exports = (app) ->
     socket.on 'node:operation', (operation) ->
       # TODO: Check that it's a valid operation
       # operation.user = socket.id # Just for good measure/debugging?
-      emitAll('node:operation', operation)
+      socket.broadcast.emit('node:operation', operation)
       history.push operation
 
     # Broadcast edits
     socket.on 'node:update', (msg) ->
-      node = msg.id
+      node = msg.node
       # TODO: Check that it's a valid operation
       # operation.user = socket.id # Just for good measure/debugging?
       socket.broadcast.emit 'node:update', msg
@@ -124,7 +124,7 @@ module.exports = (app) ->
       replacedAnotherEdit = false
       for entry in history
         if entry.command == 'node:update'
-          if entry.message.id == node
+          if entry.message.node == node
             entry.message = msg
             replacedAnotherEdit = true
         
