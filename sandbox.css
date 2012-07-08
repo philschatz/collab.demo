@@ -191,7 +191,7 @@ h2::before { content: counter(section) "." counter(sub-section); }
 
 .github-ribbon {
   z-index: 1000;
-  background: -webkit-gradient(linear, left bottom, left top, from(#DC7202), to(#EE7906));
+  background-color: orangered;
 
   top: 3.2em;
   right: -3.7em;
