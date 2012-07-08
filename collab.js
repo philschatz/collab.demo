@@ -24,11 +24,11 @@
         debugReceive('user:leave');
         debugReceive('node:select');
         debugReceive('node:operation');
-        $doc[0].innerHTML = '';
         users = {};
         me = null;
         socket.on('user:hello', function(msg) {
-          return me = msg;
+          me = msg;
+          return $doc[0].innerHTML = '';
         });
         socket.on('user:join', function(msg) {
           return users[msg.user] = msg.color;
@@ -105,15 +105,19 @@
             next = parent.nextAll('*[id]').first();
             if (next.length) {
               op = 'insertbefore';
-              context = next;
+              context = next.attr('id');
             } else {
               op = 'append';
-              context = parent.parent();
+              if ($doc[0] = parent.parent()[0]) {
+                context = null;
+              } else {
+                context = parent.parent().attr('id');
+              }
             }
             socket.emit('node:operation', {
               op: op,
               node: id,
-              context: context.attr('id'),
+              context: context,
               html: html
             });
             return socket.emit('node:select', [id]);

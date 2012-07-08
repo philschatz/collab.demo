@@ -109,9 +109,9 @@ module.exports = (app) ->
     # Handle document operations
     socket.on 'node:operation', (operation) ->
       # TODO: Check that it's a valid operation
-      # operation.user = socket.id # Just for good measure/debugging?
+      operation.user = socket.id # Just for good measure/debugging?
       socket.broadcast.emit('node:operation', operation)
-      history.push operation
+      history.push { command: 'node:operation', message: operation }
 
     # Broadcast edits
     socket.on 'node:update', (msg) ->
