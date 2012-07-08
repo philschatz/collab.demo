@@ -77,7 +77,7 @@ module.exports = (app) ->
       color: color
 
     # Let everyone know this client has joined in
-    emitAll 'user:join',
+    socket.broadcast.emit 'user:join',
       id: socket.id
       color: color
 
@@ -108,14 +108,28 @@ module.exports = (app) ->
 
     # Handle document operations
     socket.on 'node:operation', (operation) ->
-      # Check that this user has a lock on the node
-      if socket.id == locks[node]
-        # TODO: Check that it's a valid operation
-        # operation.user = socket.id # Just for good measure/debugging?
-        emitAll('node:operation', operation)
-        history.push operation
-      else
-        console.log "USER DOESN'T HAVE A LOCK ON THE NODE!"
+      # TODO: Check that it's a valid operation
+      # operation.user = socket.id # Just for good measure/debugging?
+      emitAll('node:operation', operation)
+      history.push operation
+
+    # Broadcast edits
+    socket.on 'node:update', (msg) ->
+      node = msg.id
+      # TODO: Check that it's a valid operation
+      # operation.user = socket.id # Just for good measure/debugging?
+      socket.broadcast.emit 'node:update', msg
+      
+      # Search through the history and if there's already an edit for this node collapse it
+      replacedAnotherEdit = false
+      for entry in history
+        if entry.command == 'node:update'
+          if entry.message.id == node
+            entry.message = msg
+            replacedAnotherEdit = true
+        
+      if not replacedAnotherEdit
+        history.push msg
 
     # Handle disconnects by notifying everyone the user disconnected
     socket.on 'disconnect', ->

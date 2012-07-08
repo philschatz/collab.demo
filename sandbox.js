@@ -142,7 +142,7 @@
   Aloha.ready(function() {
     var $, $doc, debugReceive, me, socket, users;
     $ = Aloha.jQuery;
-    if (io) {
+    if (typeof io !== "undefined" && io !== null) {
       /*
           socket = null
           for url in [ 'http://localhost:3001', 'http://boole.cnx.rice.edu', '' ]
@@ -195,11 +195,8 @@
           for (node in msg) {
             user = msg[node];
             $node = $('#' + node);
-            $handle = $('#' + node + '-handle');
-            if (!$handle.length) {
-              $handle = $("<div id='" + node + "-handle' contenteditable='false'></div>").addClass('handle');
-              $handle.addClass('handle').hide().appendTo('body');
-            }
+            $handle = $("<div id='" + node + "-handle' contenteditable='false'></div>").addClass('handle');
+            $handle.addClass('handle').hide().appendTo('body');
             $handle.attr('style', "background-color: " + users[user] + ";");
             css = {};
             css.top = $node.offset().top;
@@ -217,10 +214,18 @@
           }
           return _results;
         });
-        return Aloha.bind("aloha-selection-changed", function(event, rangeObject) {
-          var parent;
+        socket.on('node:update', function(msg) {
+          return $('#' + msg.id)[0].innerHTML = msg.html;
+        });
+        return Aloha.bind('aloha-selection-changed', function(event, rangeObject) {
+          var id, parent;
           parent = $(rangeObject.startContainer).parents('*[id]').first();
-          return socket.emit('node:select', [parent.attr('id')]);
+          id = parent.attr('id');
+          socket.emit('node:select', [id]);
+          return socket.emit('node:update', {
+            id: id,
+            html: parent[0].innerHTML
+          });
         });
       } else {
         return console.warn('Could not find a collaboration server');

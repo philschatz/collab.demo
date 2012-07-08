@@ -121,7 +121,7 @@ Aloha.ready ->
 Aloha.ready ->
   $ = Aloha.jQuery
   
-  if io
+  if io?
     ###
     socket = null
     for url in [ 'http://localhost:3001', 'http://boole.cnx.rice.edu', '' ]
@@ -179,12 +179,10 @@ Aloha.ready ->
         
         for node, user of msg
           $node = $('#' + node)
-          $handle = $('#' + node + '-handle')
-          
-          if not $handle.length # No handle found
-            $handle = $("<div id='#{ node }-handle' contenteditable='false'></div>").addClass('handle')
-            $handle.addClass('handle').hide().appendTo('body')
-          
+
+          $handle = $("<div id='#{ node }-handle' contenteditable='false'></div>").addClass('handle')
+          $handle.addClass('handle').hide().appendTo('body')
+
           $handle.attr('style', "background-color: #{ users[user] };")
           css = {}
           css.top = $node.offset().top
@@ -196,9 +194,17 @@ Aloha.ready ->
             $node.addClass('remote-selected')
             $node.attr('contenteditable', false)
   
+      socket.on 'node:update', (msg) ->
+        $('#' + msg.id)[0].innerHTML = msg.html
+
       # Lock a node when selection changes
-      Aloha.bind "aloha-selection-changed", (event, rangeObject) ->
+      Aloha.bind 'aloha-selection-changed', (event, rangeObject) ->
         parent = $(rangeObject.startContainer).parents('*[id]').first()
-        socket.emit 'node:select', [ parent.attr('id') ]
+        id = parent.attr('id')
+        socket.emit 'node:select', [ id ]
+        
+        # The selection also changes every time text is edited
+        socket.emit 'node:update', { id: id, html: parent[0].innerHTML }
+
     else
       console.warn 'Could not find a collaboration server'
