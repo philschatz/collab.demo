@@ -12,6 +12,9 @@
 
 <script src="http://localhost:3001/socket.io/socket.io.js"></script>
 
+<link rel="stylesheet" type="text/css" href="./menubar/css/menubar.css" />
+<script src="./menubar/menubar.js"></script>
+
 <script type="text/javascript">
 Aloha = {};
 Aloha.settings = {};
@@ -48,10 +51,10 @@ Aloha.settings.bundles = {
               extra/sourceview"></script>
 
 
-
 <script>window.socketUrl = 'http://localhost:3001';</script>
 <script src="./sandbox.js"></script>
 <script src="./collab.js"></script>
+
 
 <script>Aloha.ready(function() { window.collaborate(window.socketUrl, Aloha.jQuery('.document')); });</script>
 

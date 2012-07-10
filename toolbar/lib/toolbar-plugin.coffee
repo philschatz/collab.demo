@@ -1,30 +1,33 @@
 define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!format/nls/i18n", "i18n!aloha/nls/i18n", "aloha/console", "css!toolbar/css/toolbar.css" ], (Aloha, Plugin, jQuery, FloatingMenu, i18n, i18nCore) ->
 
-  TOOLBAR_JQUERY = jQuery("<div class=\"toolbar\"></div>").appendTo("body")
+  CONTAINER_JQUERY = jQuery('.toolbar') || jQuery('<div></div>').addClass('toolbar-container').appendTo('body')
   # Changed every time selectionChanged event is fired
   rangeHack = null
   enabledButtons = [ "b", "i", "s", "sub", "sup", "quote", "ul", "ol", "indent-list", "outdent-list", "insertLink", "removeLink" ]
 
+  toolbar = new menubar.ToolBar()
+  toolbar.render().appendTo CONTAINER_JQUERY
+  
   FloatingMenu_addButton = (scope, button, tab, group) ->
     # Disable all the buttons except the ones we want to support
     return  if enabledButtons.indexOf(button.name) < 0
 
-    # Note: Use a <button> so the aloha css rules apply and the buttons get a fancy icon
-    $button = jQuery("<div class=\"button\"><button class=\"inner " + button.iconClass + " " + button.name + "\"></div></div>").appendTo(TOOLBAR_JQUERY)
-    $button.attr "title", button.name
+    btn = new menubar.ToolButton button.name, 
+      iconCls: button.iconClass
+      toolTip: button.name
+      action: (evt) ->
+        evt.stopPropagation() # Don't lose focus from the editor
+        Aloha.Selection.rangeObject = rangeHack
+        button.onclick()
 
-    # mousedown instead of click because Aloha.activeEditable.obj is somehow set to null on click
-    $button.bind "mousedown", (evt) ->
-      evt.stopPropagation() # Don't lose focus from the editor
-      Aloha.Selection.rangeObject = rangeHack
-      button.onclick()
+    toolbar.append btn
 
     # Customize the setPressed (called when selection updates)
     button.setPressed = (pressed) ->
       if pressed
-        $button.addClass "pressed"
+        btn.checked(true)
       else
-        $button.removeClass "pressed"
+        btn.checked(false)
 
   ###
    register the plugin with unique name
