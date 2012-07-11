@@ -5,12 +5,12 @@
     CONTAINER_JQUERY = jQuery('.toolbar') || jQuery('<div></div>').addClass('toolbar-container').appendTo('body');
     rangeHack = null;
     enabledButtons = ["b", "i", "s", "sub", "sup", "quote", "ul", "ol", "indent-list", "outdent-list", "insertLink", "removeLink"];
-    window.toolbar = toolbar = new menubar.ToolBar();
+    window.toolbar = toolbar = new appmenus.ToolBar();
     toolbar.render().appendTo(CONTAINER_JQUERY);
     FloatingMenu_addButton = function(scope, button, tab, group) {
       var btn;
       if (enabledButtons.indexOf(button.name) < 0) return;
-      btn = new menubar.ToolButton(button.name, {
+      btn = new appmenus.ToolButton(button.name, {
         iconCls: button.iconClass,
         toolTip: button.name,
         action: function(evt) {
@@ -44,21 +44,21 @@
           return Aloha.Selection.changeMarkupOnSelection(Aloha.jQuery(this.markup));
         };
         headingButtons = [
-          new menubar.custom.Heading("<p></p>", "Normal Text", {
+          new appmenus.custom.Heading("<p></p>", "Normal Text", {
             action: applyHeading
-          }), new menubar.custom.Heading("<h1></h1>", "Heading 1", {
+          }), new appmenus.custom.Heading("<h1></h1>", "Heading 1", {
             action: applyHeading
-          }), new menubar.custom.Heading("<h2></h2>", "Heading 2", {
+          }), new appmenus.custom.Heading("<h2></h2>", "Heading 2", {
             action: applyHeading
-          }), new menubar.custom.Heading("<h3></h3>", "Heading 3", {
+          }), new appmenus.custom.Heading("<h3></h3>", "Heading 3", {
             action: applyHeading
           })
         ];
-        headings = new menubar.ToolButton("Heading 1", {
-          subMenu: new menubar.Menu(headingButtons)
+        headings = new appmenus.ToolButton("Heading 1", {
+          subMenu: new appmenus.Menu(headingButtons)
         });
         toolbar.append(headings);
-        toolbar.append(new menubar.Separator());
+        toolbar.append(new appmenus.Separator());
         Aloha.bind("aloha-selection-changed", function(event, rangeObject) {
           return rangeHack = rangeObject;
         });

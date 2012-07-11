@@ -32,11 +32,11 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 */
 
 (function() {
-  var Menu, MenuBar, MenuBase, MenuButton, MenuItem, Separator, ToolBar, ToolButton, menubar,
+  var Menu, MenuBar, MenuBase, MenuButton, MenuItem, Separator, ToolBar, ToolButton, appmenus,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
-  window.menubar = menubar = {};
+  window.appmenus = appmenus = {};
 
   MenuBase = MenuBase = (function() {
 
@@ -71,7 +71,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
   })();
 
-  menubar.Menu = Menu = (function(_super) {
+  appmenus.Menu = Menu = (function(_super) {
 
     __extends(Menu, _super);
 
@@ -147,7 +147,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
   })(MenuBase);
 
-  menubar.MenuItem = MenuItem = (function(_super) {
+  appmenus.MenuItem = MenuItem = (function(_super) {
 
     __extends(MenuItem, _super);
 
@@ -254,7 +254,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
   })(MenuBase);
 
-  menubar.Separator = Separator = (function(_super) {
+  appmenus.Separator = Separator = (function(_super) {
 
     __extends(Separator, _super);
 
@@ -271,7 +271,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
   })(MenuItem);
 
-  menubar.ToolBar = ToolBar = (function(_super) {
+  appmenus.ToolBar = ToolBar = (function(_super) {
 
     __extends(ToolBar, _super);
 
@@ -287,7 +287,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
   })(Menu);
 
-  menubar.ToolButton = ToolButton = (function(_super) {
+  appmenus.ToolButton = ToolButton = (function(_super) {
 
     __extends(ToolButton, _super);
 
@@ -319,7 +319,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
   })(MenuItem);
 
-  menubar.MenuBar = MenuBar = (function(_super) {
+  appmenus.MenuBar = MenuBar = (function(_super) {
 
     __extends(MenuBar, _super);
 
@@ -332,7 +332,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
   })(Menu);
 
-  menubar.MenuButton = MenuButton = (function(_super) {
+  appmenus.MenuButton = MenuButton = (function(_super) {
 
     __extends(MenuButton, _super);
 
@@ -358,9 +358,9 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
   })(MenuItem);
 
-  menubar.custom = {};
+  appmenus.custom = {};
 
-  menubar.custom.Heading = (function(_super) {
+  appmenus.custom.Heading = (function(_super) {
 
     __extends(Heading, _super);
 

@@ -5,14 +5,14 @@ define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!fo
   rangeHack = null
   enabledButtons = [ "b", "i", "s", "sub", "sup", "quote", "ul", "ol", "indent-list", "outdent-list", "insertLink", "removeLink" ]
 
-  window.toolbar = toolbar = new menubar.ToolBar()
+  window.toolbar = toolbar = new appmenus.ToolBar()
   toolbar.render().appendTo CONTAINER_JQUERY
   
   FloatingMenu_addButton = (scope, button, tab, group) ->
     # Disable all the buttons except the ones we want to support
     return  if enabledButtons.indexOf(button.name) < 0
 
-    btn = new menubar.ToolButton button.name, 
+    btn = new appmenus.ToolButton button.name, 
       iconCls: button.iconClass
       toolTip: button.name
       action: (evt) ->
@@ -45,15 +45,15 @@ define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!fo
 
       
       headingButtons = [
-        new menubar.custom.Heading("<p></p>", "Normal Text", {action: applyHeading } )
-        new menubar.custom.Heading("<h1></h1>", "Heading 1", {action: applyHeading } )
-        new menubar.custom.Heading("<h2></h2>", "Heading 2", {action: applyHeading } )
-        new menubar.custom.Heading("<h3></h3>", "Heading 3", {action: applyHeading } )
+        new appmenus.custom.Heading("<p></p>", "Normal Text", {action: applyHeading } )
+        new appmenus.custom.Heading("<h1></h1>", "Heading 1", {action: applyHeading } )
+        new appmenus.custom.Heading("<h2></h2>", "Heading 2", {action: applyHeading } )
+        new appmenus.custom.Heading("<h3></h3>", "Heading 3", {action: applyHeading } )
       ]
       
-      headings = new menubar.ToolButton("Heading 1", {subMenu: new menubar.Menu(headingButtons)})
+      headings = new appmenus.ToolButton("Heading 1", {subMenu: new appmenus.Menu(headingButtons)})
       toolbar.append(headings)
-      toolbar.append(new menubar.Separator())
+      toolbar.append(new appmenus.Separator())
 
       # Keep track of the range because Aloha.Selection.obj seems to go {} sometimes
       Aloha.bind "aloha-selection-changed", (event, rangeObject) ->

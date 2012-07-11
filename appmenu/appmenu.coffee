@@ -30,7 +30,7 @@ ToolBar > Menu = [ ToolButton ]
 ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
 ###
-window.menubar = menubar = {}
+window.appmenus = appmenus = {}
 
 MenuBase = class MenuBase
   constructor: (@cls = '') ->
@@ -55,7 +55,7 @@ MenuBase = class MenuBase
     el
 
 
-menubar.Menu = class Menu extends MenuBase
+appmenus.Menu = class Menu extends MenuBase
   constructor: (@items=[]) ->
     @addClass 'menu'
   
@@ -102,7 +102,7 @@ menubar.Menu = class Menu extends MenuBase
         item.subMenu.close()
     @el.hide()
 
-menubar.MenuItem = class MenuItem extends MenuBase
+appmenus.MenuItem = class MenuItem extends MenuBase
   constructor: (@text, conf = {}) ->
     @addClass 'menu-item'
     @action = conf.action || null
@@ -183,7 +183,7 @@ menubar.MenuItem = class MenuItem extends MenuBase
     @el
       
 
-menubar.Separator = class Separator extends MenuItem
+appmenus.Separator = class Separator extends MenuItem
   constructor: () ->
     super(null, { disabled: true })
     @addClass 'separator'
@@ -191,7 +191,7 @@ menubar.Separator = class Separator extends MenuItem
 
 # ---- Specific to ToolBar ---
 
-menubar.ToolBar = class ToolBar extends Menu
+appmenus.ToolBar = class ToolBar extends Menu
   constructor: (items=[]) ->
     super items
     @cls = 'tool-bar' # Don't add it to 'menu'
@@ -199,7 +199,7 @@ menubar.ToolBar = class ToolBar extends Menu
   close: () ->
     # Never close a toolbar
 
-menubar.ToolButton = class ToolButton extends MenuItem
+appmenus.ToolButton = class ToolButton extends MenuItem
   constructor: (text, conf) ->
     super(text, conf)
     @addClass 'tool-button'
@@ -224,12 +224,12 @@ menubar.ToolButton = class ToolButton extends MenuItem
 
 # ---- Specific to MenuBar ---
 
-menubar.MenuBar = class MenuBar extends Menu
+appmenus.MenuBar = class MenuBar extends Menu
   constructor: (@items) ->
     @cls = 'menu-bar' # Don't add it to 'menu'
   
 
-menubar.MenuButton = class MenuButton extends MenuItem
+appmenus.MenuButton = class MenuButton extends MenuItem
   constructor: (text, subMenu) ->
     super(text, { subMenu: subMenu })
     @addClass 'menu-button'
@@ -244,8 +244,8 @@ menubar.MenuButton = class MenuButton extends MenuItem
 
 
 # ---- Custom MenuItems and Menus ---
-menubar.custom = {}
-class menubar.custom.Heading extends MenuItem
+appmenus.custom = {}
+class appmenus.custom.Heading extends MenuItem
   constructor: (@markup, text, conf) ->
     super(text, conf)
   
