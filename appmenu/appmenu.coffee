@@ -115,7 +115,7 @@ appmenu.MenuItem = class MenuItem extends MenuBase
     # By default it's a right arrow, but the toolbar buttons use a down arrow
     @subMenuChar = '\u25B6'
 
-  checked: (@isChecked) ->
+  setChecked: (@isChecked) ->
     if @el
       @el.children('.checked-icon').remove() # Always remove
       if @isChecked
@@ -124,6 +124,10 @@ appmenu.MenuItem = class MenuItem extends MenuBase
         @_newDiv('checked-icon').append('\u2713').appendTo(@el)
       else
         @el.removeClass('checked')
+
+  setText: (@text) ->
+    if @el
+      @el.children('.text')[0].innerHTML = @text
   
   _addEvents: ($el) ->
     that = @
@@ -162,7 +166,7 @@ appmenu.MenuItem = class MenuItem extends MenuBase
       if @accel? then @_newDiv('accel').append(@accel).appendTo(@el)
       if @isDisabled then @el.addClass('disabled')
       if @isHidden then @el.addClass('hidden')
-      @checked(@isChecked)
+      @setChecked(@isChecked)
       if @text? then @_newDiv('text').append(@text).appendTo(@el)
       if @subMenu?
         @el.addClass('submenu')

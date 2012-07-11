@@ -22,9 +22,9 @@
       toolbar.append(btn);
       return button.setPressed = function(pressed) {
         if (pressed) {
-          return btn.checked(true);
+          return btn.setChecked(true);
         } else {
-          return btn.checked(false);
+          return btn.setChecked(false);
         }
       };
     };
@@ -67,13 +67,19 @@
         toolbar.append(headingsButton);
         toolbar.append(new appmenu.Separator());
         Aloha.bind("aloha-selection-changed", function(event, rangeObject) {
-          var $el, h, i, _len, _results;
+          var $el, h, i, isActive, _len, _results;
           rangeHack = rangeObject;
           $el = Aloha.jQuery(rangeObject.startContainer);
           _results = [];
           for (i = 0, _len = order.length; i < _len; i++) {
             h = order[i];
-            _results.push(headingButtons[i].checked($el.parents(h).length > 0));
+            isActive = $el.parents(h).length > 0;
+            headingButtons[i].setChecked(isActive);
+            if (isActive) {
+              _results.push(headingsButton.setText(labels[h]));
+            } else {
+              _results.push(void 0);
+            }
           }
           return _results;
         });

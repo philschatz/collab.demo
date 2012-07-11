@@ -165,7 +165,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
       this.subMenuChar = '\u25B6';
     }
 
-    MenuItem.prototype.checked = function(isChecked) {
+    MenuItem.prototype.setChecked = function(isChecked) {
       this.isChecked = isChecked;
       if (this.el) {
         this.el.children('.checked-icon').remove();
@@ -176,6 +176,11 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
           return this.el.removeClass('checked');
         }
       }
+    };
+
+    MenuItem.prototype.setText = function(text) {
+      this.text = text;
+      if (this.el) return this.el.children('.text')[0].innerHTML = this.text;
     };
 
     MenuItem.prototype._addEvents = function($el) {
@@ -227,7 +232,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
         }
         if (this.isDisabled) this.el.addClass('disabled');
         if (this.isHidden) this.el.addClass('hidden');
-        this.checked(this.isChecked);
+        this.setChecked(this.isChecked);
         if (this.text != null) {
           this._newDiv('text').append(this.text).appendTo(this.el);
         }

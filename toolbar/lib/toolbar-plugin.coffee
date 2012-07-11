@@ -25,9 +25,9 @@ define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!fo
     # Customize the setPressed (called when selection updates)
     button.setPressed = (pressed) ->
       if pressed
-        btn.checked(true)
+        btn.setChecked(true)
       else
-        btn.checked(false)
+        btn.setChecked(false)
 
   ###
    register the plugin with unique name
@@ -63,7 +63,11 @@ define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!fo
         rangeHack = rangeObject
         $el = Aloha.jQuery(rangeObject.startContainer)
         for h, i in order
-          headingButtons[i].checked($el.parents(h).length > 0)
+          isActive = $el.parents(h).length > 0
+          headingButtons[i].setChecked(isActive)
+          # Update the toolbar to show the current heading level
+          if isActive
+            headingsButton.setText labels[h]
 
       Aloha.bind "focus", (event, rangeObject) ->
         # Squirrel away the range because clicking the button changes focus and removed the range
