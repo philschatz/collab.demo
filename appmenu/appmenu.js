@@ -32,11 +32,11 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 */
 
 (function() {
-  var Menu, MenuBar, MenuBase, MenuButton, MenuItem, Separator, ToolBar, ToolButton, appmenus,
+  var Menu, MenuBar, MenuBase, MenuButton, MenuItem, Separator, ToolBar, ToolButton, appmenu,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
-  window.appmenus = appmenus = {};
+  window.appmenu = appmenu = {};
 
   MenuBase = MenuBase = (function() {
 
@@ -71,7 +71,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
   })();
 
-  appmenus.Menu = Menu = (function(_super) {
+  appmenu.Menu = Menu = (function(_super) {
 
     __extends(Menu, _super);
 
@@ -147,7 +147,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
   })(MenuBase);
 
-  appmenus.MenuItem = MenuItem = (function(_super) {
+  appmenu.MenuItem = MenuItem = (function(_super) {
 
     __extends(MenuItem, _super);
 
@@ -167,12 +167,14 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
     MenuItem.prototype.checked = function(isChecked) {
       this.isChecked = isChecked;
-      if (this.isChecked) {
-        this.el.addClass('checked');
-        return this._newDiv('checked-icon').append('\u2713').appendTo(this.el);
-      } else {
-        this.el.removeClass('checked');
-        return this.el.children('.checked-icon').remove();
+      if (this.el) {
+        this.el.children('.checked-icon').remove();
+        if (this.isChecked) {
+          this.el.addClass('checked');
+          return this._newDiv('checked-icon').append('\u2713').appendTo(this.el);
+        } else {
+          return this.el.removeClass('checked');
+        }
       }
     };
 
@@ -254,7 +256,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
   })(MenuBase);
 
-  appmenus.Separator = Separator = (function(_super) {
+  appmenu.Separator = Separator = (function(_super) {
 
     __extends(Separator, _super);
 
@@ -271,7 +273,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
   })(MenuItem);
 
-  appmenus.ToolBar = ToolBar = (function(_super) {
+  appmenu.ToolBar = ToolBar = (function(_super) {
 
     __extends(ToolBar, _super);
 
@@ -287,7 +289,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
   })(Menu);
 
-  appmenus.ToolButton = ToolButton = (function(_super) {
+  appmenu.ToolButton = ToolButton = (function(_super) {
 
     __extends(ToolButton, _super);
 
@@ -319,7 +321,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
   })(MenuItem);
 
-  appmenus.MenuBar = MenuBar = (function(_super) {
+  appmenu.MenuBar = MenuBar = (function(_super) {
 
     __extends(MenuBar, _super);
 
@@ -332,7 +334,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
   })(Menu);
 
-  appmenus.MenuButton = MenuButton = (function(_super) {
+  appmenu.MenuButton = MenuButton = (function(_super) {
 
     __extends(MenuButton, _super);
 
@@ -358,9 +360,9 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
   })(MenuItem);
 
-  appmenus.custom = {};
+  appmenu.custom = {};
 
-  appmenus.custom.Heading = (function(_super) {
+  appmenu.custom.Heading = (function(_super) {
 
     __extends(Heading, _super);
 

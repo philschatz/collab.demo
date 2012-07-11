@@ -5,12 +5,12 @@
     CONTAINER_JQUERY = jQuery('.toolbar') || jQuery('<div></div>').addClass('toolbar-container').appendTo('body');
     rangeHack = null;
     enabledButtons = ["b", "i", "s", "sub", "sup", "quote", "ul", "ol", "indent-list", "outdent-list", "insertLink", "removeLink"];
-    window.toolbar = toolbar = new appmenus.ToolBar();
+    window.toolbar = toolbar = new appmenu.ToolBar();
     toolbar.render().appendTo(CONTAINER_JQUERY);
     FloatingMenu_addButton = function(scope, button, tab, group) {
       var btn;
       if (enabledButtons.indexOf(button.name) < 0) return;
-      btn = new appmenus.ToolButton(button.name, {
+      btn = new appmenu.ToolButton(button.name, {
         iconCls: button.iconClass,
         toolTip: button.name,
         action: function(evt) {
@@ -33,7 +33,7 @@
     */
     return Plugin.create("toolbar", {
       init: function() {
-        var applyHeading, headingButtons, headings;
+        var applyHeading, h, headingButtons, headingsButton, labels, order;
         FloatingMenu.addButton = FloatingMenu_addButton;
         applyHeading = function() {
           var rangeObject;
@@ -43,24 +43,39 @@
           }
           return Aloha.Selection.changeMarkupOnSelection(Aloha.jQuery(this.markup));
         };
-        headingButtons = [
-          new appmenus.custom.Heading("<p></p>", "Normal Text", {
-            action: applyHeading
-          }), new appmenus.custom.Heading("<h1></h1>", "Heading 1", {
-            action: applyHeading
-          }), new appmenus.custom.Heading("<h2></h2>", "Heading 2", {
-            action: applyHeading
-          }), new appmenus.custom.Heading("<h3></h3>", "Heading 3", {
-            action: applyHeading
-          })
-        ];
-        headings = new appmenus.ToolButton("Heading 1", {
-          subMenu: new appmenus.Menu(headingButtons)
+        order = ['p', 'h1', 'h2', 'h3'];
+        labels = {
+          'p': 'Normal Text',
+          'h1': 'Heading 1',
+          'h2': 'Heading 2',
+          'h3': 'Heading 3'
+        };
+        headingButtons = (function() {
+          var _i, _len, _results;
+          _results = [];
+          for (_i = 0, _len = order.length; _i < _len; _i++) {
+            h = order[_i];
+            _results.push(new appmenu.custom.Heading("<" + h + " />", labels[h], {
+              action: applyHeading
+            }));
+          }
+          return _results;
+        })();
+        headingsButton = new appmenu.ToolButton("Heading 1", {
+          subMenu: new appmenu.Menu(headingButtons)
         });
-        toolbar.append(headings);
-        toolbar.append(new appmenus.Separator());
+        toolbar.append(headingsButton);
+        toolbar.append(new appmenu.Separator());
         Aloha.bind("aloha-selection-changed", function(event, rangeObject) {
-          return rangeHack = rangeObject;
+          var $el, h, i, _len, _results;
+          rangeHack = rangeObject;
+          $el = Aloha.jQuery(rangeObject.startContainer);
+          _results = [];
+          for (i = 0, _len = order.length; i < _len; i++) {
+            h = order[i];
+            _results.push(headingButtons[i].checked($el.parents(h).length > 0));
+          }
+          return _results;
         });
         return Aloha.bind("focus", function(event, rangeObject) {
           return rangeHack = rangeObject;

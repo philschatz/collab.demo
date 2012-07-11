@@ -30,7 +30,7 @@ ToolBar > Menu = [ ToolButton ]
 ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
 ###
-window.appmenus = appmenus = {}
+window.appmenu = appmenu = {}
 
 MenuBase = class MenuBase
   constructor: (@cls = '') ->
@@ -55,7 +55,7 @@ MenuBase = class MenuBase
     el
 
 
-appmenus.Menu = class Menu extends MenuBase
+appmenu.Menu = class Menu extends MenuBase
   constructor: (@items=[]) ->
     @addClass 'menu'
   
@@ -102,7 +102,7 @@ appmenus.Menu = class Menu extends MenuBase
         item.subMenu.close()
     @el.hide()
 
-appmenus.MenuItem = class MenuItem extends MenuBase
+appmenu.MenuItem = class MenuItem extends MenuBase
   constructor: (@text, conf = {}) ->
     @addClass 'menu-item'
     @action = conf.action || null
@@ -116,13 +116,14 @@ appmenus.MenuItem = class MenuItem extends MenuBase
     @subMenuChar = '\u25B6'
 
   checked: (@isChecked) ->
-    if @isChecked
-      @el.addClass('checked')
-      # Insert a div the the checkbox character
-      @_newDiv('checked-icon').append('\u2713').appendTo(@el)
-    else
-      @el.removeClass('checked')
-      @el.children('.checked-icon').remove()
+    if @el
+      @el.children('.checked-icon').remove() # Always remove
+      if @isChecked
+        @el.addClass('checked')
+        # Insert a div the the checkbox character
+        @_newDiv('checked-icon').append('\u2713').appendTo(@el)
+      else
+        @el.removeClass('checked')
   
   _addEvents: ($el) ->
     that = @
@@ -183,7 +184,7 @@ appmenus.MenuItem = class MenuItem extends MenuBase
     @el
       
 
-appmenus.Separator = class Separator extends MenuItem
+appmenu.Separator = class Separator extends MenuItem
   constructor: () ->
     super(null, { disabled: true })
     @addClass 'separator'
@@ -191,7 +192,7 @@ appmenus.Separator = class Separator extends MenuItem
 
 # ---- Specific to ToolBar ---
 
-appmenus.ToolBar = class ToolBar extends Menu
+appmenu.ToolBar = class ToolBar extends Menu
   constructor: (items=[]) ->
     super items
     @cls = 'tool-bar' # Don't add it to 'menu'
@@ -199,7 +200,7 @@ appmenus.ToolBar = class ToolBar extends Menu
   close: () ->
     # Never close a toolbar
 
-appmenus.ToolButton = class ToolButton extends MenuItem
+appmenu.ToolButton = class ToolButton extends MenuItem
   constructor: (text, conf) ->
     super(text, conf)
     @addClass 'tool-button'
@@ -224,12 +225,12 @@ appmenus.ToolButton = class ToolButton extends MenuItem
 
 # ---- Specific to MenuBar ---
 
-appmenus.MenuBar = class MenuBar extends Menu
+appmenu.MenuBar = class MenuBar extends Menu
   constructor: (@items) ->
     @cls = 'menu-bar' # Don't add it to 'menu'
   
 
-appmenus.MenuButton = class MenuButton extends MenuItem
+appmenu.MenuButton = class MenuButton extends MenuItem
   constructor: (text, subMenu) ->
     super(text, { subMenu: subMenu })
     @addClass 'menu-button'
@@ -244,8 +245,8 @@ appmenus.MenuButton = class MenuButton extends MenuItem
 
 
 # ---- Custom MenuItems and Menus ---
-appmenus.custom = {}
-class appmenus.custom.Heading extends MenuItem
+appmenu.custom = {}
+class appmenu.custom.Heading extends MenuItem
   constructor: (@markup, text, conf) ->
     super(text, conf)
   

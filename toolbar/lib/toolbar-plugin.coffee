@@ -5,14 +5,14 @@ define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!fo
   rangeHack = null
   enabledButtons = [ "b", "i", "s", "sub", "sup", "quote", "ul", "ol", "indent-list", "outdent-list", "insertLink", "removeLink" ]
 
-  window.toolbar = toolbar = new appmenus.ToolBar()
+  window.toolbar = toolbar = new appmenu.ToolBar()
   toolbar.render().appendTo CONTAINER_JQUERY
   
   FloatingMenu_addButton = (scope, button, tab, group) ->
     # Disable all the buttons except the ones we want to support
     return  if enabledButtons.indexOf(button.name) < 0
 
-    btn = new appmenus.ToolButton button.name, 
+    btn = new appmenu.ToolButton button.name, 
       iconCls: button.iconClass
       toolTip: button.name
       action: (evt) ->
@@ -44,21 +44,26 @@ define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!fo
         Aloha.Selection.changeMarkupOnSelection Aloha.jQuery(@markup)
 
       
-      headingButtons = [
-        new appmenus.custom.Heading("<p></p>", "Normal Text", {action: applyHeading } )
-        new appmenus.custom.Heading("<h1></h1>", "Heading 1", {action: applyHeading } )
-        new appmenus.custom.Heading("<h2></h2>", "Heading 2", {action: applyHeading } )
-        new appmenus.custom.Heading("<h3></h3>", "Heading 3", {action: applyHeading } )
-      ]
+      order = [ 'p', 'h1', 'h2', 'h3' ]
+      labels =
+        'p':  'Normal Text'
+        'h1': 'Heading 1'
+        'h2': 'Heading 2'
+        'h3': 'Heading 3'
+
+      headingButtons = (new appmenu.custom.Heading("<#{ h } />", labels[h], {action: applyHeading }) for h in order)
       
-      headings = new appmenus.ToolButton("Heading 1", {subMenu: new appmenus.Menu(headingButtons)})
-      toolbar.append(headings)
-      toolbar.append(new appmenus.Separator())
+      headingsButton = new appmenu.ToolButton("Heading 1", {subMenu: new appmenu.Menu(headingButtons)})
+      toolbar.append(headingsButton)
+      toolbar.append(new appmenu.Separator())
 
       # Keep track of the range because Aloha.Selection.obj seems to go {} sometimes
       Aloha.bind "aloha-selection-changed", (event, rangeObject) ->
         # Squirrel away the range because clicking the button changes focus and removed the range
         rangeHack = rangeObject
+        $el = Aloha.jQuery(rangeObject.startContainer)
+        for h, i in order
+          headingButtons[i].checked($el.parents(h).length > 0)
 
       Aloha.bind "focus", (event, rangeObject) ->
         # Squirrel away the range because clicking the button changes focus and removed the range
