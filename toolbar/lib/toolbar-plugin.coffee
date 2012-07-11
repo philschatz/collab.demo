@@ -16,7 +16,7 @@ define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!fo
       iconCls: button.iconClass
       toolTip: button.name
       action: (evt) ->
-        #evt.preventDefault() # Don't lose focus from the editor
+        evt.preventDefault() # Don't lose focus from the editor
         Aloha.Selection.rangeObject = rangeHack
         button.onclick()
 

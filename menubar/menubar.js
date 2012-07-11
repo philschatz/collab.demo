@@ -94,7 +94,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
       that = this;
       Aloha.jQuery('body').one('mouseup', function() {
         return setTimeout(function() {
-          return Aloha.jQuery('body').one('mousedown', function() {
+          return Aloha.jQuery('body').one('click', function() {
             return setTimeout(that.close.bind(that), 10);
           });
         }, 10);
@@ -240,6 +240,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
           }
           that = this;
           this.el.bind('mousedown', function(evt) {
+            evt.preventDefault();
             Aloha.jQuery('.menu').hide();
             if (that.action != null) return that.action(evt);
           });
@@ -347,6 +348,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
       if (this.subMenu != null) {
         that = this;
         return $el.bind('mousedown', function(evt) {
+          evt.preventDefault();
           return that._openSubMenu($el, false);
         });
       }

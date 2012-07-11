@@ -74,7 +74,7 @@ menubar.Menu = class Menu extends MenuBase
     that = @
     Aloha.jQuery('body').one 'mouseup', () ->
       setTimeout( () ->
-        Aloha.jQuery('body').one 'mousedown', () ->
+        Aloha.jQuery('body').one 'click', () ->
           setTimeout(that.close.bind(that), 10)
       , 10)
     @el
@@ -173,7 +173,7 @@ menubar.MenuItem = class MenuItem extends MenuBase
         if @accel? then console.log("TODO: Adding hotkey handler #{ @accel }")
         that = @
         @el.bind 'mousedown', (evt) ->
-          #evt.preventDefault()
+          evt.preventDefault()
           # TODO: Hide all menus
           Aloha.jQuery('.menu').hide()
           if that.action?
@@ -239,7 +239,7 @@ menubar.MenuButton = class MenuButton extends MenuItem
       that = @
       # Open the menu on click
       $el.bind 'mousedown', (evt) ->
-        #evt.preventDefault()
+        evt.preventDefault()
         that._openSubMenu($el, false) # false == open-below
 
 

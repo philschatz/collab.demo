@@ -14,6 +14,7 @@
         iconCls: button.iconClass,
         toolTip: button.name,
         action: function(evt) {
+          evt.preventDefault();
           Aloha.Selection.rangeObject = rangeHack;
           return button.onclick();
         }
