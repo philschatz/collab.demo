@@ -68,7 +68,15 @@ menubar.Menu = class Menu extends MenuBase
       $item = item.render()
       @_closeEverythingBut(item, $item)
       @el.append($item)
-    
+
+    # Close the menu on second click
+    # Add a handler for when someone clicks outside the menu
+    that = @
+    Aloha.jQuery('body').one 'mouseup', () ->
+      setTimeout( () ->
+        Aloha.jQuery('body').one 'mousedown', () ->
+          setTimeout(that.close.bind(that), 10)
+      , 10)
     @el
 
   _closeEverythingBut: (item, $item) ->
@@ -146,7 +154,9 @@ menubar.MenuItem = class MenuItem extends MenuBase
       @el.children().remove()
       
       # Add all the classes and child elements (ie icon, accelerator key)
-      if @iconCls? then @_newDiv('menu-icon').addClass(@iconCls).appendTo(@el)
+      if @iconCls? 
+        @el.addClass('icon')
+        @_newDiv('menu-icon').addClass(@iconCls).appendTo(@el)
       # @accel must go before @text otherwise shows up on next line
       if @accel? then @_newDiv('accel').append(@accel).appendTo(@el)
       if @isDisabled then @el.addClass('disabled')
@@ -161,12 +171,12 @@ menubar.MenuItem = class MenuItem extends MenuBase
       # Add some event handlers
       if not @isDisabled
         if @accel? then console.log("TODO: Adding hotkey handler #{ @accel }")
-        if @action?
-          that = @
-          @el.bind 'mousedown', (evt) ->
-            evt.stopPropagation()
-            # TODO: Hide all menus
-            Aloha.jQuery('.menu').hide()
+        that = @
+        @el.bind 'mousedown', (evt) ->
+          #evt.preventDefault()
+          # TODO: Hide all menus
+          Aloha.jQuery('.menu').hide()
+          if that.action?
             that.action(evt)
   
         @_addEvents(@el)
@@ -185,6 +195,9 @@ menubar.ToolBar = class ToolBar extends Menu
   constructor: (items=[]) ->
     super items
     @cls = 'tool-bar' # Don't add it to 'menu'
+  
+  close: () ->
+    # Never close a toolbar
 
 menubar.ToolButton = class ToolButton extends MenuItem
   constructor: (text, conf) ->
@@ -226,45 +239,22 @@ menubar.MenuButton = class MenuButton extends MenuItem
       that = @
       # Open the menu on click
       $el.bind 'mousedown', (evt) ->
-        evt.stopPropagation()
+        #evt.preventDefault()
         that._openSubMenu($el, false) # false == open-below
-        # Close the menu on second click
-        # Add a handler for when someone clicks outside the menu
-        Aloha.jQuery('body').one 'mousedown', () ->
-          setTimeout(that.subMenu.close.bind(that.subMenu), 10)
 
 
-
-
-
-
-
-  simple = new MenuItem('Format C:')
-  simple2 = new MenuItem('Submenu',
-    action: () -> alert 'submenu clicked!'
-  )
+# ---- Custom MenuItems and Menus ---
+menubar.custom = {}
+class menubar.custom.Heading extends MenuItem
+  constructor: (@markup, text, conf) ->
+    super(text, conf)
   
-  withIcon = new MenuItem('Bold',
-    action: () -> alert 'unbolding'
-    checked: true
-    #iconCls: 'bold'
-  )
-  
-  complex1 = new MenuItem('Disabled but Complex',
-    action: () -> alert "Clicked!"
-    iconCls: 'bold'
-    accel: 'Ctrl+B'
-    disabled: true
-  )
-  
-  complex2 = new MenuItem('Has Submenu',
-    iconCls: 'bold'
-    checked: true
-    subMenu: new Menu([ simple2 ])
-  )
-  
-  menu1 = new Menu([ new MenuItem('New...'), new MenuItem('Save'), new MenuItem('Print') ])
-  menu2 = new Menu([ simple, withIcon, complex1, new Separator(), complex2 ])
-  
-  menubar.exampleMenu = new MenuBar([ new MenuButton('File', menu1), new MenuButton('Edit', menu2) ])
-  menubar.exampleTool = new ToolBar([ new ToolButton('Insert', { iconCls: 'bold', accel: 'Ctrl+B', subMenu: new Menu([ complex1, complex2 ]) } ), new Separator(), new ToolButton('Bold', { iconCls: 'bold' }) ])
+  _newDiv: (cls) ->
+    # HACK: Only override the text div
+    if cls == 'text'
+      $el = Aloha.jQuery(@markup)
+      $el.addClass(cls)
+      $el.addClass('custom-heading')
+      $el
+    else
+      super(cls)

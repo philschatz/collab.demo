@@ -81,7 +81,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
     }
 
     Menu.prototype.render = function() {
-      var $item, item, _i, _len, _ref;
+      var $item, item, that, _i, _len, _ref;
       if (!(this.el != null)) this.el = Menu.__super__.render.call(this);
       this.el.children().remove();
       _ref = this.items;
@@ -91,6 +91,14 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
         this._closeEverythingBut(item, $item);
         this.el.append($item);
       }
+      that = this;
+      Aloha.jQuery('body').one('mouseup', function() {
+        return setTimeout(function() {
+          return Aloha.jQuery('body').one('mousedown', function() {
+            return setTimeout(that.close.bind(that), 10);
+          });
+        }, 10);
+      });
       return this.el;
     };
 
@@ -209,6 +217,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
         this.el.removeClass('disabled hidden checked');
         this.el.children().remove();
         if (this.iconCls != null) {
+          this.el.addClass('icon');
           this._newDiv('menu-icon').addClass(this.iconCls).appendTo(this.el);
         }
         if (this.accel != null) {
@@ -229,14 +238,11 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
           if (this.accel != null) {
             console.log("TODO: Adding hotkey handler " + this.accel);
           }
-          if (this.action != null) {
-            that = this;
-            this.el.bind('mousedown', function(evt) {
-              evt.stopPropagation();
-              Aloha.jQuery('.menu').hide();
-              return that.action(evt);
-            });
-          }
+          that = this;
+          this.el.bind('mousedown', function(evt) {
+            Aloha.jQuery('.menu').hide();
+            if (that.action != null) return that.action(evt);
+          });
           this._addEvents(this.el);
         }
       }
@@ -273,6 +279,8 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
       ToolBar.__super__.constructor.call(this, items);
       this.cls = 'tool-bar';
     }
+
+    ToolBar.prototype.close = function() {};
 
     return ToolBar;
 
@@ -324,7 +332,6 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
   })(Menu);
 
   menubar.MenuButton = MenuButton = (function(_super) {
-    var complex1, complex2, menu1, menu2, simple, simple2, withIcon;
 
     __extends(MenuButton, _super);
 
@@ -340,62 +347,39 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
       if (this.subMenu != null) {
         that = this;
         return $el.bind('mousedown', function(evt) {
-          evt.stopPropagation();
-          that._openSubMenu($el, false);
-          return Aloha.jQuery('body').one('mousedown', function() {
-            return setTimeout(that.subMenu.close.bind(that.subMenu), 10);
-          });
+          return that._openSubMenu($el, false);
         });
       }
     };
 
-    simple = new MenuItem('Format C:');
-
-    simple2 = new MenuItem('Submenu', {
-      action: function() {
-        return alert('submenu clicked!');
-      }
-    });
-
-    withIcon = new MenuItem('Bold', {
-      action: function() {
-        return alert('unbolding');
-      },
-      checked: true
-    });
-
-    complex1 = new MenuItem('Disabled but Complex', {
-      action: function() {
-        return alert("Clicked!");
-      },
-      iconCls: 'bold',
-      accel: 'Ctrl+B',
-      disabled: true
-    });
-
-    complex2 = new MenuItem('Has Submenu', {
-      iconCls: 'bold',
-      checked: true,
-      subMenu: new Menu([simple2])
-    });
-
-    menu1 = new Menu([new MenuItem('New...'), new MenuItem('Save'), new MenuItem('Print')]);
-
-    menu2 = new Menu([simple, withIcon, complex1, new Separator(), complex2]);
-
-    menubar.exampleMenu = new MenuBar([new MenuButton('File', menu1), new MenuButton('Edit', menu2)]);
-
-    menubar.exampleTool = new ToolBar([
-      new ToolButton('Insert', {
-        iconCls: 'bold',
-        accel: 'Ctrl+B',
-        subMenu: new Menu([complex1, complex2])
-      }), new Separator(), new ToolButton('Bold', {
-        iconCls: 'bold'
-      })
-    ]);
-
     return MenuButton;
+
+  })(MenuItem);
+
+  menubar.custom = {};
+
+  menubar.custom.Heading = (function(_super) {
+
+    __extends(Heading, _super);
+
+    function Heading(markup, text, conf) {
+      this.markup = markup;
+      Heading.__super__.constructor.call(this, text, conf);
+    }
+
+    Heading.prototype._newDiv = function(cls) {
+      var $el;
+      if (cls === 'text') {
+        $el = Aloha.jQuery(this.markup);
+        $el.addClass(cls);
+        $el.addClass('custom-heading');
+        return $el;
+      } else {
+        return Heading.__super__._newDiv.call(this, cls);
+      }
+    };
+
+    return Heading;
 
   })(MenuItem);
 

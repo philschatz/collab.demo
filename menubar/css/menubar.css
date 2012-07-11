@@ -37,11 +37,15 @@
 .tool-bar > .tool-button > .tool-tip {
   display: none;
 }
-.tool-bar > .tool-button > .text {
-  display: none;
-}
 .tool-bar > .tool-button > .menu-icon {
   display: inline-block;
+}
+.tool-bar > .tool-button > .text {
+  display: inline-block;
+  font-weight: bold;
+}
+.tool-bar > .tool-button.icon > .text {
+  display: none;
 }
 .tool-bar > .tool-button > .submenu {
   display: inline-block;
@@ -108,6 +112,10 @@
   padding: 6px 7em 6px 30px;
   cursor: default;
 }
+.menu > .checked > .checked-icon {
+  position: absolute;
+  left: 3px;
+}
 .menu-bar {
   background-color: white;
   min-height: 30px;
@@ -144,7 +152,7 @@
   padding: 5px 0;
   vertical-align: middle;
 }
-.menu > .checked > .checked-icon {
-  position: absolute;
-  left: 3px;
+.menu-item .custom-heading::before {
+  position: static;
+  margin-right: 0.5em;
 }

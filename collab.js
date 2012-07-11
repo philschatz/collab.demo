@@ -12,7 +12,7 @@
       var socket;
       socket = io.connect(url);
       return socket.on('connect', function() {
-        var autoId, debugReceive, me, users;
+        var autoId, changeHandler, debugReceive, me, users;
         debugReceive = function(command) {
           return socket.on(command, function(message) {
             return console.log('Received: ' + command, message);
@@ -46,6 +46,9 @@
             case 'insertbefore':
               $context = $('#' + msg.context);
               return $el = $(msg.html).attr('id', msg.node).insertBefore($context);
+            case 'delete':
+              $context = $('#' + msg.context);
+              return $context.remove();
             default:
               return console.log('Could not understand operation ', msg.op, msg);
           }
@@ -83,7 +86,7 @@
           }, 100);
         });
         autoId = 0;
-        return Aloha.bind('aloha-selection-changed', function(event, rangeObject) {
+        changeHandler = function(event, rangeObject) {
           var context, html, id, next, node, op, parent;
           parent = $(rangeObject.startContainer).parents('*[id]').first();
           if (parent.length && $doc[0] !== parent[0]) {
@@ -122,6 +125,17 @@
             });
             return socket.emit('node:select', [id]);
           }
+        };
+        Aloha.bind("aloha-selection-changed", changeHandler);
+        return Aloha.jQuery('.document').bind("focus", function(evt) {
+          return setTimeout((function() {
+            var rangeObject, ranges, sel;
+            sel = rangy.getSelection();
+            ranges = sel.getAllRanges();
+            if (ranges.length === 0) return;
+            rangeObject = ranges[0];
+            return changeHandler(evt, rangeObject);
+          }), 10);
         });
       });
     };

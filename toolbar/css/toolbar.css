@@ -181,11 +181,11 @@
 .tool-bar > .tool-button > .tool-tip {
   display: none;
 }
-.tool-bar > .tool-button > .text {
-  display: none;
-}
 .tool-bar > .tool-button > .menu-icon {
   display: inline-block;
+}
+.tool-bar > .tool-button > .icon > .text {
+  display: none;
 }
 .tool-bar > .tool-button > .submenu {
   display: inline-block;

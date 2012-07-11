@@ -7,7 +7,7 @@
     /*
        Also, has code for supporting drag-and-drop handles
     */
-    var $cmd, $context, $document, $handle, $icon, $menu, $overlay, buttons, cmd, dragScope, getSelectionRect, showContext, _i, _len;
+    var $cmd, $context, $document, $handle, $icon, $menu, $overlay, buttons, changeHandler, cmd, dragScope, getSelectionRect, showContext, _i, _len;
     getSelectionRect = function(rangeObject) {
       if (!rangeObject.getStartDocumentPos) {
         console.error("Couldn't call getStartDocumentPos on rangy (wrong ver of rangy and proper plugins not installed");
@@ -82,12 +82,12 @@
       });
     });
     $handle = Aloha.jQuery("<div class=\"handle\" contenteditable=\"false\"></div>").hide().appendTo("body");
-    Aloha.bind("aloha-selection-changed", function(event, rangeObject) {
+    changeHandler = function(event, rangeObject) {
       var $end, $start, css, end, range, ranges, sel, start;
       sel = rangy.getSelection();
       ranges = sel.getAllRanges();
       if (ranges.length === 0) return;
-      range = rangeObject;
+      range = rangeObject || ranges[0];
       start = range.startContainer;
       end = range.endContainer;
       if (rangeObject.getStartDocumentPos) {
@@ -109,6 +109,12 @@
       } else {
         return $handle.hide();
       }
+    };
+    Aloha.bind("aloha-selection-changed", changeHandler);
+    $document.bind("focus", function(evt) {
+      return setTimeout((function() {
+        return changeHandler(evt, Aloha.Selection.rangeObject);
+      }), 10);
     });
     dragScope = "blockish-nodes-only";
     return $handle.draggable({

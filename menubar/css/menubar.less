@@ -29,8 +29,12 @@
 
     &> .accel { display: none; }
     &> .tool-tip { display: none; }
-    &> .text { display: none; }
     &> .menu-icon { display: inline-block; }
+    &> .text {
+      display: inline-block;
+      font-weight: bold;
+    }
+    &.icon > .text { display: none; }
     &> .submenu {
       display: inline-block;
       position: relative;
@@ -100,14 +104,19 @@
   -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   padding: 6px 0;
+
+
+  &> .menu-item {
+    padding: 6px 7em 6px 30px;
+    cursor: default;
+  }
+
+  &> .checked > .checked-icon {
+    position: absolute;
+    left: 3px;
+  }
+
 }
-
-
-.menu > .menu-item {
-  padding: 6px 7em 6px 30px;
-  cursor: default;
-}
-
 
 
 .menu-bar {
@@ -127,7 +136,13 @@
 }
 
 
-.menu > .separator { padding: 0; border-bottom: 1px solid; margin-top: 6px; margin-bottom: 7px; }
+.menu > .separator {
+  padding: 0;
+  border-bottom: 1px solid;
+  margin-top: 6px;
+  margin-bottom: 7px;
+}
+
 .tool-bar > .separator {
   display: inline-block;
   border-right: 1px solid;
@@ -138,7 +153,7 @@
 }
 
 
-.menu > .checked > .checked-icon {
-  position: absolute;
-  left: 3px;
+.menu-item .custom-heading::before {
+  position: static;
+  margin-right: 0.5em;
 }

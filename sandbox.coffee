@@ -73,11 +73,13 @@ Aloha.ready ->
       $icon.hide()
 
   $handle = Aloha.jQuery("<div class=\"handle\" contenteditable=\"false\"></div>").hide().appendTo("body")
-  Aloha.bind "aloha-selection-changed", (event, rangeObject) ->
+  
+  changeHandler = (event, rangeObject) ->
     sel = rangy.getSelection()
     ranges = sel.getAllRanges()
     return  if ranges.length is 0
-    range = rangeObject
+
+    range = rangeObject || ranges[0]
     start = range.startContainer
     end = range.endContainer
     if rangeObject.getStartDocumentPos
@@ -95,6 +97,11 @@ Aloha.ready ->
       $handle.css(css).show()
     else
       $handle.hide()
+
+  Aloha.bind "aloha-selection-changed", changeHandler
+  # On focus the cursor isn't available yet so fire the event after a period of time
+  $document.bind "focus", (evt) ->
+    setTimeout (() -> changeHandler evt, Aloha.Selection.rangeObject), 10
 
   dragScope = "blockish-nodes-only"
   $handle.draggable

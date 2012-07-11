@@ -5,7 +5,7 @@ define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!fo
   rangeHack = null
   enabledButtons = [ "b", "i", "s", "sub", "sup", "quote", "ul", "ol", "indent-list", "outdent-list", "insertLink", "removeLink" ]
 
-  toolbar = new menubar.ToolBar()
+  window.toolbar = toolbar = new menubar.ToolBar()
   toolbar.render().appendTo CONTAINER_JQUERY
   
   FloatingMenu_addButton = (scope, button, tab, group) ->
@@ -16,7 +16,7 @@ define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!fo
       iconCls: button.iconClass
       toolTip: button.name
       action: (evt) ->
-        evt.stopPropagation() # Don't lose focus from the editor
+        #evt.preventDefault() # Don't lose focus from the editor
         Aloha.Selection.rangeObject = rangeHack
         button.onclick()
 
@@ -37,9 +37,30 @@ define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!fo
 
       # Override the FloatingMenu.addButton
       FloatingMenu.addButton = FloatingMenu_addButton
+      
+      applyHeading = () ->
+        rangeObject = Aloha.Selection.rangeObject
+        GENTICS.Utils.Dom.extendToWord rangeObject  if rangeObject.isCollapsed()
+        Aloha.Selection.changeMarkupOnSelection Aloha.jQuery(@markup)
+
+      
+      headingButtons = [
+        new menubar.custom.Heading("<p></p>", "Normal Text", {action: applyHeading } )
+        new menubar.custom.Heading("<h1></h1>", "Heading 1", {action: applyHeading } )
+        new menubar.custom.Heading("<h2></h2>", "Heading 2", {action: applyHeading } )
+        new menubar.custom.Heading("<h3></h3>", "Heading 3", {action: applyHeading } )
+      ]
+      
+      headings = new menubar.ToolButton("Heading 1", {subMenu: new menubar.Menu(headingButtons)})
+      toolbar.append(headings)
+      toolbar.append(new menubar.Separator())
 
       # Keep track of the range because Aloha.Selection.obj seems to go {} sometimes
       Aloha.bind "aloha-selection-changed", (event, rangeObject) ->
+        # Squirrel away the range because clicking the button changes focus and removed the range
+        rangeHack = rangeObject
+
+      Aloha.bind "focus", (event, rangeObject) ->
         # Squirrel away the range because clicking the button changes focus and removed the range
         rangeHack = rangeObject
 

@@ -44,6 +44,9 @@ Aloha.ready ->
          when 'insertbefore'
            $context = $('#' + msg.context)
            $el = $(msg.html).attr('id', msg.node).insertBefore($context)
+         when 'delete'
+           $context = $('#' + msg.context)
+           $context.remove()
          else
             console.log 'Could not understand operation ', msg.op, msg
   
@@ -77,7 +80,7 @@ Aloha.ready ->
   
       autoId = 0 # Incremented
       # Lock a node when selection changes
-      Aloha.bind 'aloha-selection-changed', (event, rangeObject) ->
+      changeHandler = (event, rangeObject) ->
         parent = $(rangeObject.startContainer).parents('*[id]').first()
         if parent.length && $doc[0] != parent[0]
           node = parent.attr('id')
@@ -117,7 +120,17 @@ Aloha.ready ->
             context: context
             html: html
           socket.emit 'node:select', [ id ]
-          
+
+      Aloha.bind "aloha-selection-changed", changeHandler
+      # On focus the cursor isn't available yet so fire the event after a period of time
+      Aloha.jQuery('.document').bind "focus", (evt) ->
+        setTimeout (() ->
+          sel = rangy.getSelection()
+          ranges = sel.getAllRanges()
+          return  if ranges.length is 0
+          rangeObject = ranges[0]
+          changeHandler evt, rangeObject), 10
+    
   
   if io?
 
