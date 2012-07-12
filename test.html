@@ -98,8 +98,14 @@ Aloha.settings.bundles = {
 Aloha.ready(function() {
   var $document = Aloha.jQuery('.document');
   $document.aloha();
+  // Every 30 seconds update the textarea with the HTML
+  setInterval(function() {
+    Aloha.jQuery('.source').val($document.html());
+  }, 10000)
 });
 </script>
+
+<textarea class="source"></textarea>
 
 </body>
 

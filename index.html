@@ -63,9 +63,6 @@ Aloha.settings.bundles = {
   <link rel="stylesheet" type="text/css" href="./appmenu/appmenu.css" />
   <script src="./appmenu/appmenu.js"></script>
 
-<!-- This starts up collaboration mode all the time -->
-<script>Aloha.ready(function() { if(window.collaborate) window.collaborate(window.socketUrl, Aloha.jQuery('.document')); });</script>
-
 </head>
 
 <body>
@@ -100,6 +97,28 @@ Aloha.ready(function() {
   $document.aloha();
 });
 </script>
+
+
+<div class="collaborate" style="display: none;">
+  
+  <p>Click to <a class="collaborate" href="#">Enable Collaboration</a></p>
+  
+  <p>To see the collaboration (assuming the collaboration server is running) do the following:</p>
+  <ol>
+    <li>Open this page in a new window or different browser</li>
+    <li>In the other window click the "Enable Collaboration" button as well</li>
+    <li>The page should reload with an example document</li>
+    <li>Click around (without making changes) and notice the other window updates</li>
+    <li>After a couple of clicks, change the text by:
+      <ul>
+        <li>Typing in new text</li>
+        <li>Making some text bold/italic</li>
+        <li>Deleting characters</li>
+      </ul>
+    </li>
+    <li>Note: Cut, Copy, Paste, and Undo don't work collaboratively yet</li>
+  </ol>
+</div>
 
 </body>
 
