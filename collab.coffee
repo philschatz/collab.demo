@@ -23,19 +23,8 @@ Aloha.ready ->
       users = {} # This will be populated by active users
       me = null
       
-      socket.on 'user:hello', (msg) ->
-        me = msg
-        # Replace the document with one from the server
-        $doc[0].innerHTML = ''
-  
-      socket.on 'user:join', (msg) ->
-        users[msg.user] = msg.color
-  
-      socket.on 'user:leave', (msg) ->
-        delete users[msg.user]
-      
       # Replay changes made by others
-      socket.on 'node:operation', (msg) ->
+      onOperation = (msg) ->
        switch msg.op
          when 'append'
            $context = $doc
@@ -49,7 +38,36 @@ Aloha.ready ->
            $context.remove()
          else
             console.log 'Could not understand operation ', msg.op, msg
+
+      socket.on 'node:operation', onOperation
+
+      socket.on 'document:reset', () ->
+        $doc[0].innerHTML = ''
+      
+      socket.on 'user:hello', (msg) ->
+        me = msg
+        # Send a reset and then send the current document
+        els = $doc.children() # Save the children before deleting them with 'document:reset'
+        $doc[0].innerHTML = ''
+        socket.emit 'document:reset'
+        nextId = 0
+        for el in els
+          id ="id-#{ ++nextId }"
+          $(el).attr 'id', id
+          operation =
+            op: 'append'
+            node: id
+            context: null
+            html: el.outerHTML
+          socket.emit 'node:operation', operation
+          onOperation operation
   
+      socket.on 'user:join', (msg) ->
+        users[msg.user] = msg.color
+  
+      socket.on 'user:leave', (msg) ->
+        delete users[msg.user]
+        
       # Update the handle bars when a selection change occurs
       socket.on 'node:select', (msg) ->
         # Remove all handles TODO: reduce flicker

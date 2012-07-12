@@ -1,0 +1,85 @@
+/******************
+    Page styling
+******************/
+body {
+  margin: 0;
+  color: #404040;
+  background-color: #F0F1EB;
+  height: 100%;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.document {
+  counter-reset: section, sub-section;
+  min-width: 300px;
+  margin: 3em 70px;
+  box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.35), inset 0px 0px 1px rgba(255, 255, 255, 0.15);
+  background-color: white;
+  -webkit-font-smoothing: subpixel-antialiased;
+  line-height: 30px;
+  padding: 3em 6em;
+}
+
+h1 {
+  counter-increment: section;
+  counter-reset: sub-section;
+  font-size: 20pt;
+  font-weight: bold;
+}
+h2 {
+  counter-increment: sub-section;
+  font-size: 18pt;
+  font-weight: bold;
+}
+/* Use ::after, position:absolute, and left: 4em so the number doesn't affect Title layout */
+h1::before,
+h2::before,
+h3::before {
+  color: #CCC;
+  position: absolute;
+  left: 120px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+h1::before { content: counter(section); }
+h2::before { content: counter(section) "." counter(sub-section); }
+
+
+/* Collaboration handle */
+.handle {
+  left: 50px;
+  cursor: pointer;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+
+/******************
+    OER Tags
+******************/
+span.term {
+  font-weight: bold;
+  border-bottom: 1px dotted black;
+}
+
+/* Inline notes */
+span.note {
+  background-color: #ffcccc;
+}
+span.note::before {
+  content: "Note: ";
+  color: gray;
+  font-weight: bold;
+}
+
+
+span.footnote {
+  font-size: 66.66%;
+  vertical-align: super;
+}
+span.footnote::before {
+  content: "[#]";
+  color: lightgray;
+  font-size: 150%;
+  vertical-align: sub;
+}

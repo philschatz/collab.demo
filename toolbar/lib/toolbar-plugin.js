@@ -9,24 +9,33 @@
     toolbar.render().appendTo(CONTAINER_JQUERY);
     FloatingMenu_addButton = function(scope, button, tab, group) {
       var btn;
-      if (enabledButtons.indexOf(button.name) < 0) return;
       btn = new appmenu.ToolButton(button.name, {
         iconCls: button.iconClass,
         toolTip: button.name,
         action: function(evt) {
           evt.preventDefault();
           Aloha.Selection.rangeObject = rangeHack;
-          return button.onclick();
+          button.btnEl = {
+            dom: this.el[0]
+          };
+          return button.onclick(button, evt);
         }
       });
-      toolbar.append(btn);
-      return button.setPressed = function(pressed) {
+      button.setPressed = function(pressed) {
         if (pressed) {
           return btn.setChecked(true);
         } else {
           return btn.setChecked(false);
         }
       };
+      button.disable = function() {
+        return btn.setDisabled(true);
+      };
+      button.enable = function() {
+        return btn.setDisabled(false);
+      };
+      if (enabledButtons.indexOf(button.name) < 0) return;
+      return toolbar.append(btn);
     };
     /*
        register the plugin with unique name

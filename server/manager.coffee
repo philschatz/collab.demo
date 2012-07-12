@@ -33,30 +33,7 @@ module.exports = (app) ->
   lastColor = 0
   locks = {}
   history = []
-  sessions = {}
-  
-  
-  ###
-    Add some operations that create a sample collaborative document
-  ###
-  populateId = 0
-  populate = (outerHTML, context=null) ->
-    history.push
-      command: 'node:operation'
-      message:
-        op: 'append'
-        node: "id-#{ ++populateId }"
-        context: context
-        html: outerHTML
-    "id-#{ populateId }"
-
-  populate '<h1>Campaign Finance Reform</h1>'
-  populate '<h2>Current proposals for reform</h2>'
-  dollarsId = populate '<h3>Voting with dollars</h3>'
-  populate '<p>The voting with dollars plan would establish a system of modified <span class="term">public financing</span> coupled with an anonymous campaign contribution process. It has two parts: patriot dollars and the secret donation booth. It was originally described in detail by Yale Law School professors Bruce Ackerman and Ian Ayres in their 2004 book Voting with Dollars: A new paradigm for campaign finance.[7] All voters would be given a $50 publicly funded voucher (Patriot dollars) to donate to federal political campaigns. All donations including both the $50 voucher and additional private contributions, must be made anonymously through the FEC. Ackerman and Ayres include model legislation in their book in addition to detailed discussion as to how such a system could be achieved and its legal basis.</p>'
-  populate '<h2>Matching Funds</h2>'
-  populate '<p>Another paragraph with one<sub>subscript</sub>.</p>'
-  
+  sessions = {}  
   
   # Keep track of messages emitted so new clients can 'catch up'
   emitAll = (command, params) ->
@@ -94,6 +71,15 @@ module.exports = (app) ->
     # Send a set of locked elements
     emitAll 'node:select', locks
     
+    # When a new user starts collaborating reset the doc
+    socket.on 'document:reset', (nodes) ->
+      # Remove all locks this user has
+      locks = {}
+      history = []
+      
+      socket.broadcast.emit 'document:reset'
+      emitAll('node:select', locks)
+
     # When a user tries to lock something lock it
     socket.on 'node:select', (nodes) ->
       # Remove all locks this user has

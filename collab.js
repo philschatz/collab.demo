@@ -12,7 +12,7 @@
       var socket;
       socket = io.connect(url);
       return socket.on('connect', function() {
-        var autoId, changeHandler, debugReceive, me, users;
+        var autoId, changeHandler, debugReceive, me, onOperation, users;
         debugReceive = function(command) {
           return socket.on(command, function(message) {
             return console.log('Received: ' + command, message);
@@ -26,17 +26,7 @@
         debugReceive('node:operation');
         users = {};
         me = null;
-        socket.on('user:hello', function(msg) {
-          me = msg;
-          return $doc[0].innerHTML = '';
-        });
-        socket.on('user:join', function(msg) {
-          return users[msg.user] = msg.color;
-        });
-        socket.on('user:leave', function(msg) {
-          return delete users[msg.user];
-        });
-        socket.on('node:operation', function(msg) {
+        onOperation = function(msg) {
           var $context, $el;
           switch (msg.op) {
             case 'append':
@@ -52,6 +42,39 @@
             default:
               return console.log('Could not understand operation ', msg.op, msg);
           }
+        };
+        socket.on('node:operation', onOperation);
+        socket.on('document:reset', function() {
+          return $doc[0].innerHTML = '';
+        });
+        socket.on('user:hello', function(msg) {
+          var el, els, id, nextId, operation, _i, _len, _results;
+          me = msg;
+          els = $doc.children();
+          $doc[0].innerHTML = '';
+          socket.emit('document:reset');
+          nextId = 0;
+          _results = [];
+          for (_i = 0, _len = els.length; _i < _len; _i++) {
+            el = els[_i];
+            id = "id-" + (++nextId);
+            $(el).attr('id', id);
+            operation = {
+              op: 'append',
+              node: id,
+              context: null,
+              html: el.outerHTML
+            };
+            socket.emit('node:operation', operation);
+            _results.push(onOperation(operation));
+          }
+          return _results;
+        });
+        socket.on('user:join', function(msg) {
+          return users[msg.user] = msg.color;
+        });
+        socket.on('user:leave', function(msg) {
+          return delete users[msg.user];
         });
         socket.on('node:select', function(msg) {
           var $handle, $node, css, node, user, _results;

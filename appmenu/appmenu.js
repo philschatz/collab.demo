@@ -165,17 +165,27 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
       this.subMenuChar = '\u25B6';
     }
 
+    MenuItem.prototype._cssToggler = function(val, clazz) {
+      if (this.el) {
+        if (val) this.el.addClass(clazz);
+        if (!val) return this.el.removeClass(clazz);
+      }
+    };
+
     MenuItem.prototype.setChecked = function(isChecked) {
       this.isChecked = isChecked;
+      this._cssToggler(this.isChecked, 'checked');
       if (this.el) {
         this.el.children('.checked-icon').remove();
         if (this.isChecked) {
-          this.el.addClass('checked');
           return this._newDiv('checked-icon').append('\u2713').appendTo(this.el);
-        } else {
-          return this.el.removeClass('checked');
         }
       }
+    };
+
+    MenuItem.prototype.setDisabled = function(isDisabled) {
+      this.isDisabled = isDisabled;
+      return this._cssToggler(this.isDisabled, 'disabled');
     };
 
     MenuItem.prototype.setText = function(text) {
@@ -230,7 +240,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
         if (this.accel != null) {
           this._newDiv('accel').append(this.accel).appendTo(this.el);
         }
-        if (this.isDisabled) this.el.addClass('disabled');
+        this.setDisabled(this.isDisabled);
         if (this.isHidden) this.el.addClass('hidden');
         this.setChecked(this.isChecked);
         if (this.text != null) {

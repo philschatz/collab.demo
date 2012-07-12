@@ -115,15 +115,22 @@ appmenu.MenuItem = class MenuItem extends MenuBase
     # By default it's a right arrow, but the toolbar buttons use a down arrow
     @subMenuChar = '\u25B6'
 
+
+  _cssToggler: (val, clazz) ->
+    if @el
+      @el.addClass(clazz) if val
+      @el.removeClass(clazz) if not val
+
   setChecked: (@isChecked) ->
+    @_cssToggler @isChecked, 'checked'
     if @el
       @el.children('.checked-icon').remove() # Always remove
       if @isChecked
-        @el.addClass('checked')
         # Insert a div the the checkbox character
         @_newDiv('checked-icon').append('\u2713').appendTo(@el)
-      else
-        @el.removeClass('checked')
+
+  setDisabled: (@isDisabled) ->
+    @_cssToggler @isDisabled, 'disabled'
 
   setText: (@text) ->
     if @el
@@ -164,7 +171,7 @@ appmenu.MenuItem = class MenuItem extends MenuBase
         @_newDiv('menu-icon').addClass(@iconCls).appendTo(@el)
       # @accel must go before @text otherwise shows up on next line
       if @accel? then @_newDiv('accel').append(@accel).appendTo(@el)
-      if @isDisabled then @el.addClass('disabled')
+      @setDisabled(@isDisabled)
       if @isHidden then @el.addClass('hidden')
       @setChecked(@isChecked)
       if @text? then @_newDiv('text').append(@text).appendTo(@el)

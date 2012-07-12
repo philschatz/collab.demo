@@ -7,33 +7,32 @@
 	
 	<title>OER Editor Sandbox</title>
 
+  <!-- These CSS/javascript files depend on where Aloha is located -->
 	<link rel="stylesheet" type="text/css" href="../aloha-0.20/css/aloha.css" />
-	<link rel="stylesheet" type="text/css" href="./sandbox.css" />
+  <!-- Use local paths to sprite files -->
 	<link rel="stylesheet" type="text/css" href="./toolbar/css/toolbar-icons-local.css" />
-
-<script src="http://localhost:3001/socket.io/socket.io.js"></script>
-
-<link rel="stylesheet" type="text/css" href="./appmenu/appmenu.css" />
-<script src="./appmenu/appmenu.js"></script>
-
+  
 <script type="text/javascript">
-Aloha = {};
-Aloha.settings = {};
+window.Aloha = window.Aloha || {};
+Aloha.settings = Aloha.settings || {};
 
-//Aloha.settings.basePath = "";
-
+// In order to load the toolbar plugin Aloha needs to know where to look it up
+// Since the toolbar plugin begins with "custom/" in @data-aloha-plugins
+// This points Aloha to use the current directory to find toolba/lib/toolbar-plugin
 Aloha.settings.bundles = {
   'custom': document.location.href.replace(/[a-z]+\.html/, ''),
 };
 
 </script>
 
+<!-- The first plugins are required but the rest are included for playing around with -->
 	<script src="../aloha-0.20/lib/aloha.js" data-aloha-plugins="
+
             custom/toolbar,
-              common/format,
-              common/highlighteditables,
-              extra/cite,
             common/dom-to-xhtml,
+              common/format,
+
+              extra/cite,
               extra/flag-icons,
               extra/wai-lang,
               common/table,
@@ -50,18 +49,35 @@ Aloha.settings.bundles = {
               extra/linkbrowser,
               extra/sourceview"></script>
 
+	<!-- URL of the collaboration server (Comment to disable) -->
+  <script src="localhost:3001/socket.io/socket.io.js"></script>
+  <script>window.socketUrl = 'localhost:3001';</script>
+	<link rel="stylesheet" type="text/css" href="./collab.css" />
+  <script src="./collab.js"></script>
 
-<script>window.socketUrl = 'http://localhost:3001';</script>
-<script src="./sandbox.js"></script>
-<script src="./collab.js"></script>
 
+  <!-- These are the CSS/Javascript files that aren't written as Aloha Plugins -->
+	<link rel="stylesheet" type="text/css" href="./page.css" />
 
-<script>Aloha.ready(function() { window.collaborate(window.socketUrl, Aloha.jQuery('.document')); });</script>
+  <!-- These render the toolbar and menubar -->
+  <link rel="stylesheet" type="text/css" href="./appmenu/appmenu.css" />
+  <script src="./appmenu/appmenu.js"></script>
+
+<!-- This starts up collaboration mode all the time -->
+<script>Aloha.ready(function() { if(window.collaborate) window.collaborate(window.socketUrl, Aloha.jQuery('.document')); });</script>
 
 </head>
 
-<body style="margin: 0">
+<body>
 
+    <div id="header" style="position: fixed; top: 0; width: 100%;">
+      <div class="menubar"></div>
+      <div class="toolbar"></div>
+    </div>
+
+    <!-- This is the main editable document.
+      The only thing it needs is to be Aloha-activated $('.document').aloha()
+    -->
     <div class="document" style="margin-top: 100px;">
         
     <h1>Campaign Finance Reform</h1>
@@ -75,12 +91,15 @@ Aloha.settings.bundles = {
 
   </div>
 
-<div id="header" style="position: fixed; top: 0; width: 100%;">
-  <div class="menubar"></div>
-  <div class="toolbar"></div>
-</div>
-
   <a class="github-ribbon" href="https://github.com/oerpub/oerpub.editor" target="_new">Fork me on Github</a>
+
+<script>
+// Make the document editable
+Aloha.ready(function() {
+  var $document = Aloha.jQuery('.document');
+  $document.aloha();
+});
+</script>
 
 </body>
 

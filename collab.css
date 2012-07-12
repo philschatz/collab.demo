@@ -1,0 +1,9 @@
+
+.handle {
+  position: absolute;
+  background-color: #999;
+  width: 20px;
+  min-height: 1em;
+  z-index: -1;
+}
+

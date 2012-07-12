@@ -9,25 +9,39 @@ define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!fo
   toolbar.render().appendTo CONTAINER_JQUERY
   
   FloatingMenu_addButton = (scope, button, tab, group) ->
-    # Disable all the buttons except the ones we want to support
-    return  if enabledButtons.indexOf(button.name) < 0
-
+    # Note: button is an Aloha.ui.Button which wrapts an ExtJS button
+  
     btn = new appmenu.ToolButton button.name, 
       iconCls: button.iconClass
       toolTip: button.name
       action: (evt) ->
         evt.preventDefault() # Don't lose focus from the editor
         Aloha.Selection.rangeObject = rangeHack
-        button.onclick()
-
-    toolbar.append btn
+        # ExtJS hack. tableCreate uses this DOM element to create a dialog box
+        button.btnEl =
+          dom: @el[0]
+        
+        button.onclick(button, evt)
 
     # Customize the setPressed (called when selection updates)
     button.setPressed = (pressed) ->
       if pressed
-        btn.setChecked(true)
+        btn.setChecked true
       else
-        btn.setChecked(false)
+        btn.setChecked false
+    # Other operations defined by Aloha.ui.Button and used by the various plugins
+    button.disable = () ->
+      btn.setDisabled true
+    button.enable = () ->
+      btn.setDisabled false
+
+    # Disable all the buttons except the ones we want to support
+    # Aloha still calls functions on the Aloha.ui.Button and expects them to
+    # have been rendered somewhere so we override the functions and just not
+    # include the button so Aloha doesn't fail when trying to update the ExtButton
+    return  if enabledButtons.indexOf(button.name) < 0
+
+    toolbar.append btn
 
   ###
    register the plugin with unique name
