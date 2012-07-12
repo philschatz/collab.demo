@@ -198,8 +198,8 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
       if (toTheRight == null) toTheRight = false;
       if (this.subMenu != null) {
         offset = $el.offset();
-        top = offset.top - $el.scrollTop();
-        left = offset.left - $el.scrollLeft();
+        top = $el.scrollTop();
+        left = $el.scrollLeft();
         if (toTheRight) {
           left += $el.outerWidth();
         } else {

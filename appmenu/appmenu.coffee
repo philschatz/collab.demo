@@ -139,8 +139,8 @@ appmenu.MenuItem = class MenuItem extends MenuBase
     if @subMenu?
       # TODO: calculate the position of the submenu
       offset = $el.offset()
-      top = offset.top - $el.scrollTop()
-      left = offset.left - $el.scrollLeft()
+      top = $el.scrollTop()
+      left = $el.scrollLeft()
       if toTheRight
         left += $el.outerWidth()
       else # below

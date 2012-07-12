@@ -137,8 +137,10 @@
   });
 
   Aloha.ready(function() {
+    var $document;
     Aloha.jQuery("<script src=\"./lib/jquery-ui.min.js\"></script>").appendTo("body");
-    return Aloha.jQuery(".document").aloha();
+    $document = Aloha.jQuery(".document");
+    return $document.aloha();
   });
 
 }).call(this);

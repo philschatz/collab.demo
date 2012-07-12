@@ -119,4 +119,5 @@ Aloha.ready ->
 
 Aloha.ready ->
   Aloha.jQuery("<script src=\"./lib/jquery-ui.min.js\"></script>").appendTo "body"
-  Aloha.jQuery(".document").aloha()
+  $document = Aloha.jQuery(".document")
+  $document.aloha()
