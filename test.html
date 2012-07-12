@@ -100,7 +100,7 @@ Aloha.ready(function() {
   $document.aloha();
   // Every 30 seconds update the textarea with the HTML
   setInterval(function() {
-    Aloha.jQuery('.source').val($document.html());
+    Aloha.jQuery('.source').val($document.html().trim());
   }, 10000)
 });
 </script>

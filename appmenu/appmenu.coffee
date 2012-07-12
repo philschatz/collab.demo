@@ -57,7 +57,7 @@ MenuBase = class MenuBase
 
 appmenu.Menu = class Menu extends MenuBase
   constructor: (@items=[]) ->
-    @addClass 'menu'
+    super 'menu'
   
   render: () ->
     if not @el?
@@ -104,7 +104,7 @@ appmenu.Menu = class Menu extends MenuBase
 
 appmenu.MenuItem = class MenuItem extends MenuBase
   constructor: (@text, conf = {}) ->
-    @addClass 'menu-item'
+    super 'menu-item'
     @action = conf.action || null
     @iconCls = conf.iconCls || null
     @accel = conf.accel || null

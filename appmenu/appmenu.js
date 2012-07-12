@@ -77,7 +77,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
     function Menu(items) {
       this.items = items != null ? items : [];
-      this.addClass('menu');
+      Menu.__super__.constructor.call(this, 'menu');
     }
 
     Menu.prototype.render = function() {
@@ -154,7 +154,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
     function MenuItem(text, conf) {
       this.text = text;
       if (conf == null) conf = {};
-      this.addClass('menu-item');
+      MenuItem.__super__.constructor.call(this, 'menu-item');
       this.action = conf.action || null;
       this.iconCls = conf.iconCls || null;
       this.accel = conf.accel || null;
