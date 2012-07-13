@@ -50,8 +50,8 @@ Aloha.settings.bundles = {
               extra/sourceview"></script>
 
 	<!-- URL of the collaboration server (Comment to disable) -->
-  <script src="localhost:3001/socket.io/socket.io.js"></script>
-  <script>window.socketUrl = 'localhost:3001';</script>
+  <script src="http://localhost:3001/socket.io/socket.io.js"></script>
+  <script>window.socketUrl = 'http://localhost:3001';</script>
 	<link rel="stylesheet" type="text/css" href="./collab.css" />
   <script src="./collab.js"></script>
 
@@ -100,8 +100,36 @@ Aloha.ready(function() {
   $document.aloha();
   // Every 30 seconds update the textarea with the HTML
   setInterval(function() {
-    Aloha.jQuery('.source').val($document.html());
-  }, 10000)
+    Aloha.jQuery('.source').val($document.html().trim());
+  }, 10000);
+  
+  // Add in some menus for effect
+  var menubar = new appmenu.MenuBar([
+    new appmenu.MenuButton('File', new appmenu.Menu([
+      new appmenu.MenuItem('New', {subMenu: new appmenu.Menu([
+        new appmenu.MenuItem('Module', {accel: 'Ctrl+N'}),
+        new appmenu.MenuItem('Collection', {accel: 'Ctrl+Shift+N', disabled: true})
+      ])}), // End "New"
+      new appmenu.MenuItem('Save'),
+      new appmenu.MenuItem('Print')
+    ]))
+  ]);
+  
+  // Render the menu
+  menubar.render().appendTo('.menubar');
+  
+  // Then add in another menu
+  menubar.append(new appmenu.MenuButton('Edit', new appmenu.Menu([
+    new appmenu.MenuItem('Cut', {accel: 'Ctrl+X'}),
+    new appmenu.MenuItem('Copy', {accel: 'Ctrl+C'}),
+    new appmenu.MenuItem('Paste', {accel: 'Ctrl+V'}),
+    new appmenu.Separator(),
+    new appmenu.MenuItem('Bold', {iconCls: 'aloha-button aloha-button-b'}),
+    new appmenu.MenuItem('Italics', {iconCls: 'aloha-button aloha-button-i'}),
+    new appmenu.Separator(),
+    new appmenu.MenuItem('Disabled Item', {disabled: true, iconCls: 'aloha-button aloha-button-i'}),
+    new appmenu.MenuItem('Checked Item', {checked: true}),
+  ]) )) // End "Edit"
 });
 </script>
 
