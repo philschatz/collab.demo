@@ -30,6 +30,9 @@
   opacity: 1.0;
   border: 1px solid #ccc;
 }
+.tool-bar > .tool-button > .checked-icon {
+  display: none;
+}
 .tool-bar > .tool-button > .accel {
   display: none;
 }
@@ -106,6 +109,9 @@
   -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   padding: 6px 0;
+  /* Make sure the menu shows up above everything else */
+
+  z-index: 1000;
 }
 .menu > .menu-item {
   padding: 6px 7em 6px 30px;

@@ -9,6 +9,14 @@ body {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
+.header {
+  width: 100%;
+  position: fixed;
+  top: 0;
+  /* Just enough so it's over the editable area that occurs after */
+  z-index: 1;
+}
+
 .document {
   counter-reset: section, sub-section;
   min-width: 300px;
@@ -18,6 +26,17 @@ body {
   -webkit-font-smoothing: subpixel-antialiased;
   line-height: 30px;
   padding: 3em 6em;
+  /* To prevent the need to make the toolbar float
+     and have the rest of the page scroll off the top of the window
+     Javascript can set the height of the div to fit within the screen
+     
+     For this, we need the following attributes
+  */
+  overflow-y: auto;
+  /* This one is needed so the section numbers scroll with the text
+     (they are absolutely positioned
+  */
+  position: relative;
 }
 
 h1 {
@@ -37,7 +56,7 @@ h2::before,
 h3::before {
   color: #CCC;
   position: absolute;
-  left: 120px;
+  left: 30px;
   user-select: none;
   -webkit-user-select: none;
 }

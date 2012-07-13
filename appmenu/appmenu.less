@@ -26,6 +26,7 @@
     }
     &.disabled:hover { border: 1px solid transparent; }
     &.checked { background-color: #eee; opacity: 1.0; border: 1px solid #ccc; }
+    &> .checked-icon { display: none; }
 
     &> .accel { display: none; }
     &> .tool-tip { display: none; }
@@ -104,6 +105,8 @@
   -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   padding: 6px 0;
+  /* Make sure the menu shows up above everything else */
+  z-index: 1000;
 
 
   &> .menu-item {

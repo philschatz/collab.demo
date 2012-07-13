@@ -92,7 +92,11 @@ appmenu.Menu = class Menu extends MenuBase
 
   open: (position) ->
     $sub = @render()
-    $sub.css(position).appendTo('body')
+    # Since we're appending to 'body' we need to shift the menu by how much the body has scrolled
+    $canvas = Aloha.jQuery('body')
+    position.top -= $canvas.scrollTop()
+    position.left -= $canvas.scrollLeft()
+    $sub.css(position).appendTo($canvas)
     $sub.show()
   
   close: () ->

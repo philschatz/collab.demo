@@ -127,9 +127,12 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
     };
 
     Menu.prototype.open = function(position) {
-      var $sub;
+      var $canvas, $sub;
       $sub = this.render();
-      $sub.css(position).appendTo('body');
+      $canvas = Aloha.jQuery('body');
+      position.top -= $canvas.scrollTop();
+      position.left -= $canvas.scrollLeft();
+      $sub.css(position).appendTo($canvas);
       return $sub.show();
     };
 
