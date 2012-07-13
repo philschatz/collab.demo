@@ -4,7 +4,7 @@ define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!fo
   enabledButtons = [ "b", "i", "s", "sub", "sup", "quote", "ul", "ol", "indent-list", "outdent-list", "insertLink", "removeLink" ]
 
   window.toolbar = toolbar = new appmenu.ToolBar()
-  toolbar.render().appendTo CONTAINER_JQUERY
+  toolbar.el.appendTo CONTAINER_JQUERY
   
   FloatingMenu_addButton = (scope, button, tab, group) ->
     # Note: button is an Aloha.ui.Button which wrapts an ExtJS button

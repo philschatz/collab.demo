@@ -40,35 +40,19 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
   MenuBase = MenuBase = (function() {
 
-    function MenuBase(cls) {
-      this.cls = cls != null ? cls : '';
-    }
+    function MenuBase() {}
 
-    MenuBase.prototype.addClass = function(cls) {
-      return this.cls += ' ' + cls;
-    };
-
-    MenuBase.prototype._newDiv = function(cls) {
+    MenuBase.prototype._newDiv = function(cls, markup) {
       var $el;
-      $el = Aloha.jQuery('<div></div>');
-      if (cls != null) $el.addClass(cls);
+      if (cls == null) cls = '';
+      if (markup == null) markup = '<div></div>';
+      $el = Aloha.jQuery(markup);
+      $el.addClass(cls);
       $el.bind('mousedown', function(evt) {
         evt.stopPropagation();
         return evt.preventDefault();
       });
       return $el;
-    };
-
-    MenuBase.prototype.render = function() {
-      var el;
-      el = this._newDiv(this.cls);
-      el.bind('mouseenter', function() {
-        return el.addClass('selected');
-      });
-      el.bind('mouseleave', function() {
-        return el.removeClass('selected');
-      });
-      return el;
     };
 
     return MenuBase;
@@ -80,32 +64,21 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
     __extends(Menu, _super);
 
     function Menu(items) {
+      var item, _i, _len, _ref;
       this.items = items != null ? items : [];
-      Menu.__super__.constructor.call(this, 'menu');
-    }
-
-    Menu.prototype.render = function() {
-      var $item, item, that, _i, _len, _ref;
-      if (!(this.el != null)) this.el = Menu.__super__.render.call(this);
-      this.el.children().remove();
+      this.el = this._newDiv('menu');
       _ref = this.items;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         item = _ref[_i];
-        $item = item.render();
-        this._closeEverythingBut(item, $item);
-        this.el.append($item);
+        this._closeEverythingBut(item);
+        this.el.append(item.el);
       }
-      that = this;
-      Aloha.jQuery('body').one('mousedown', function() {
-        return setTimeout(that.close.bind(that), 10);
-      });
-      return this.el;
-    };
+    }
 
-    Menu.prototype._closeEverythingBut = function(item, $item) {
+    Menu.prototype._closeEverythingBut = function(item) {
       var that;
       that = this;
-      return $item.bind('mouseenter', function() {
+      return item.el.bind('mouseenter', function() {
         var child, _i, _len, _ref, _results;
         _ref = that.items;
         _results = [];
@@ -123,17 +96,20 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
     Menu.prototype.append = function(item) {
       this.items.push(item);
-      return item.render().appendTo(this.el);
+      return item.el.appendTo(this.el);
     };
 
     Menu.prototype.open = function(position) {
-      var $canvas, $sub;
-      $sub = this.render();
+      var $canvas, that;
       $canvas = Aloha.jQuery('body');
       position.top -= $canvas.scrollTop();
       position.left -= $canvas.scrollLeft();
-      $sub.css(position).appendTo($canvas);
-      return $sub.show();
+      this.el.css(position).appendTo($canvas);
+      this.el.show();
+      that = this;
+      return Aloha.jQuery('body').one('mousedown', function() {
+        return setTimeout(that.close.bind(that), 10);
+      });
     };
 
     Menu.prototype.close = function() {
@@ -155,6 +131,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
     __extends(MenuItem, _super);
 
     function MenuItem(text, conf) {
+      var that;
       this.text = text;
       if (conf == null) conf = {};
       MenuItem.__super__.constructor.call(this, 'menu-item');
@@ -165,60 +142,68 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
       this.isChecked = conf.checked || false;
       this.isHidden = conf.hidden || false;
       this.subMenu = conf.subMenu || null;
-      this.subMenuChar = '\u25B6';
+      this.subMenuChar = conf.subMenuChar || '\u25B6';
+      this.el = this._newDiv('menu-item');
+      if (this.iconCls != null) {
+        this.el.addClass('icon');
+        this._newDiv('menu-icon').addClass(this.iconCls).appendTo(this.el);
+      }
+      if (this.accel != null) {
+        this._newDiv('accel').append(this.accel).appendTo(this.el);
+      }
+      this.setDisabled(this.isDisabled);
+      this.setHidden(this.isHidden);
+      this.setChecked(this.isChecked);
+      if (this.text != null) {
+        this._newDiv('text').append(this.text).appendTo(this.el);
+      }
+      if (this.subMenu != null) {
+        this.el.addClass('submenu');
+        this._newDiv('submenu').appendTo(this.el).append(this.subMenuChar);
+      }
+      if (this.accel != null) {
+        console.log("TODO: Adding hotkey handler " + this.accel);
+      }
+      that = this;
+      this.el.bind('click', function(evt) {
+        if (!that.disabled && that.action) {
+          evt.preventDefault();
+          Aloha.jQuery('.menu').hide();
+          return that.action(evt);
+        }
+      });
+      this.el.bind('mouseenter', function() {
+        return that.el.addClass('selected');
+      });
+      this.el.bind('mouseleave', function() {
+        return that.el.removeClass('selected');
+      });
+      this._addEvents();
     }
 
-    MenuItem.prototype._cssToggler = function(val, clazz) {
-      if (this.el) {
-        if (val) this.el.addClass(clazz);
-        if (!val) return this.el.removeClass(clazz);
-      }
-    };
-
-    MenuItem.prototype.setChecked = function(isChecked) {
-      this.isChecked = isChecked;
-      this._cssToggler(this.isChecked, 'checked');
-      if (this.el) {
-        this.el.children('.checked-icon').remove();
-        if (this.isChecked) {
-          return this._newDiv('checked-icon').append('\u2713').appendTo(this.el);
-        }
-      }
-    };
-
-    MenuItem.prototype.setDisabled = function(isDisabled) {
-      this.isDisabled = isDisabled;
-      return this._cssToggler(this.isDisabled, 'disabled');
-    };
-
-    MenuItem.prototype.setText = function(text) {
-      this.text = text;
-      if (this.el) return this.el.children('.text')[0].innerHTML = this.text;
-    };
-
-    MenuItem.prototype._addEvents = function($el) {
+    MenuItem.prototype._addEvents = function() {
       var that;
-      that = this;
       if (this.subMenu != null) {
-        return $el.bind('mouseenter', function() {
-          return that._openSubMenu($el, true);
+        that = this;
+        return this.el.bind('mouseenter', function() {
+          return that._openSubMenu(true);
         });
       }
     };
 
-    MenuItem.prototype._openSubMenu = function($el, toTheRight) {
+    MenuItem.prototype._openSubMenu = function(toTheRight) {
       var $parent, left, offset, parentOffset, position, top;
       if (toTheRight == null) toTheRight = false;
       if (this.subMenu != null) {
-        offset = $el.offset();
-        $parent = $el.offsetParent();
+        offset = this.el.offset();
+        $parent = this.el.offsetParent();
         parentOffset = $parent.offset();
         top = offset.top - parentOffset.top + $parent.position().top;
         left = offset.left - parentOffset.left + $parent.position().left;
         if (toTheRight) {
-          left += $el.outerWidth();
+          left += this.el.outerWidth();
         } else {
-          top += $el.outerHeight();
+          top += this.el.outerHeight();
         }
         position = {
           top: top,
@@ -232,44 +217,33 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
       return this.subMenu.close();
     };
 
-    MenuItem.prototype.render = function() {
-      var that;
-      if (!(this.el != null)) {
-        this.el = MenuItem.__super__.render.call(this);
-        this.el.removeClass('disabled hidden checked');
-        this.el.children().remove();
-        if (this.iconCls != null) {
-          this.el.addClass('icon');
-          this._newDiv('menu-icon').addClass(this.iconCls).appendTo(this.el);
-        }
-        if (this.accel != null) {
-          this._newDiv('accel').append(this.accel).appendTo(this.el);
-        }
-        this.setDisabled(this.isDisabled);
-        if (this.isHidden) this.el.addClass('hidden');
-        this.setChecked(this.isChecked);
-        if (this.text != null) {
-          this._newDiv('text').append(this.text).appendTo(this.el);
-        }
-        if (this.subMenu != null) {
-          this.el.addClass('submenu');
-          this._newDiv('submenu').appendTo(this.el).append(this.subMenuChar);
-        }
-        this.el;
-        if (!this.isDisabled) {
-          if (this.accel != null) {
-            console.log("TODO: Adding hotkey handler " + this.accel);
-          }
-          that = this;
-          this.el.bind('click', function(evt) {
-            evt.preventDefault();
-            Aloha.jQuery('.menu').hide();
-            if (that.action != null) return that.action(evt);
-          });
-          this._addEvents(this.el);
-        }
+    MenuItem.prototype._cssToggler = function(val, cls) {
+      if (val) this.el.addClass(cls);
+      if (!val) return this.el.removeClass(cls);
+    };
+
+    MenuItem.prototype.setChecked = function(isChecked) {
+      this.isChecked = isChecked;
+      this._cssToggler(this.isChecked, 'checked');
+      this.el.children('.checked-icon').remove();
+      if (this.isChecked) {
+        return this._newDiv('checked-icon').append('\u2713').appendTo(this.el);
       }
-      return this.el;
+    };
+
+    MenuItem.prototype.setDisabled = function(isDisabled) {
+      this.isDisabled = isDisabled;
+      return this._cssToggler(this.isDisabled, 'disabled');
+    };
+
+    MenuItem.prototype.setHidden = function(isHidden) {
+      this.isHidden = isHidden;
+      return this._cssToggler(this.isHidden, 'hidden');
+    };
+
+    MenuItem.prototype.setText = function(text) {
+      this.text = text;
+      return this.el.children('.text')[0].innerHTML = this.text;
     };
 
     return MenuItem;
@@ -284,7 +258,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
       Separator.__super__.constructor.call(this, null, {
         disabled: true
       });
-      this.addClass('separator');
+      this.el.addClass('separator');
     }
 
     Separator.prototype._addEvents = function() {};
@@ -300,7 +274,8 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
     function ToolBar(items) {
       if (items == null) items = [];
       ToolBar.__super__.constructor.call(this, items);
-      this.cls = 'tool-bar';
+      this.el.addClass('tool-bar');
+      this.el.removeClass('menu');
     }
 
     ToolBar.prototype.close = function() {};
@@ -314,15 +289,15 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
     __extends(ToolButton, _super);
 
     function ToolButton(text, conf) {
+      conf.subMenuChar = '\u25BC';
       ToolButton.__super__.constructor.call(this, text, conf);
-      this.addClass('tool-button');
+      this.el.addClass('tool-button');
       this.toolTip = conf.toolTip || null;
-      this.subMenuChar = '\u25BC';
     }
 
-    ToolButton.prototype._addEvents = function($el) {
+    ToolButton.prototype._addEvents = function() {
       var that, tip;
-      tip = this._newDiv('tool-tip').appendTo($el);
+      tip = this._newDiv('tool-tip').appendTo(this.el);
       if (this.toolTip != null) {
         tip.append(this.toolTip);
       } else {
@@ -331,8 +306,8 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
       }
       if (this.subMenu != null) {
         that = this;
-        return $el.bind('click', function() {
-          return that._openSubMenu($el, false);
+        return this.el.bind('click', function() {
+          return that._openSubMenu(false);
         });
       }
     };
@@ -346,8 +321,9 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
     __extends(MenuBar, _super);
 
     function MenuBar(items) {
-      this.items = items;
-      this.cls = 'menu-bar';
+      MenuBar.__super__.constructor.call(this, items);
+      this.el.addClass('menu-bar');
+      this.el.removeClass('menu');
     }
 
     MenuBar.prototype.close = function() {};
@@ -364,16 +340,15 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
       MenuButton.__super__.constructor.call(this, text, {
         subMenu: subMenu
       });
-      this.addClass('menu-button');
+      this.el.addClass('menu-button');
     }
 
-    MenuButton.prototype._addEvents = function($el) {
+    MenuButton.prototype._addEvents = function() {
       var that;
       if (this.subMenu != null) {
         that = this;
-        return $el.bind('click', function(evt) {
-          evt.preventDefault();
-          return that._openSubMenu($el, false);
+        return this.el.bind('click', function(evt) {
+          return that._openSubMenu(false);
         });
       }
     };
@@ -396,8 +371,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
     Heading.prototype._newDiv = function(cls) {
       var $el;
       if (cls === 'text') {
-        $el = Aloha.jQuery(this.markup);
-        $el.addClass(cls);
+        $el = Heading.__super__._newDiv.call(this, cls, this.markup);
         $el.addClass('custom-heading');
         return $el;
       } else {

@@ -33,15 +33,12 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 window.appmenu = appmenu = {}
 
 MenuBase = class MenuBase
-  constructor: (@cls = '') ->
-  
-  addClass: (cls) ->
-    @cls += ' ' + cls
+  constructor: () ->
   
   # Helper function
-  _newDiv: (cls) ->
-    $el = Aloha.jQuery('<div></div>')
-    $el.addClass(cls) if cls?
+  _newDiv: (cls='', markup='<div></div>') ->
+    $el = Aloha.jQuery(markup)
+    $el.addClass(cls)
     
     # Don't propagate the mousedown so we don't lose focus from the editable area
     $el.bind 'mousedown', (evt) ->
@@ -49,58 +46,39 @@ MenuBase = class MenuBase
       evt.preventDefault()
     
     $el
-  
-  render: () ->
-    el = @_newDiv(@cls)
-    # Add hover/selection
-    el.bind 'mouseenter', () ->
-      el.addClass('selected')
-    el.bind 'mouseleave', () ->
-      el.removeClass('selected')
-
-    el
 
 
 appmenu.Menu = class Menu extends MenuBase
   constructor: (@items=[]) ->
-    super 'menu'
-  
-  render: () ->
-    if not @el?
-      @el = super()
+    @el = @_newDiv('menu')
 
-    @el.children().remove()
     for item in @items
-      $item = item.render()
-      @_closeEverythingBut(item, $item)
-      @el.append($item)
+      @_closeEverythingBut(item)
+      @el.append(item.el)
 
-    # Close the menu when someone clicks outside the menu (locally mousedowns's are already squashed)
-    # Add a handler for when someone clicks outside the menu
+  _closeEverythingBut: (item) ->
     that = @
-    Aloha.jQuery('body').one 'mousedown', () ->
-      setTimeout(that.close.bind(that), 10)
-    @el
-
-  _closeEverythingBut: (item, $item) ->
-    that = @
-    $item.bind 'mouseenter', () ->
+    item.el.bind 'mouseenter', () ->
       for child in that.items
         if child.subMenu and child != item
           child.subMenu.close()
 
   append: (item) ->
     @items.push(item)
-    item.render().appendTo(@el)
+    item.el.appendTo(@el)
 
   open: (position) ->
-    $sub = @render()
     # Since we're appending to 'body' we need to shift the menu by how much the body has scrolled
     $canvas = Aloha.jQuery('body')
     position.top -= $canvas.scrollTop()
     position.left -= $canvas.scrollLeft()
-    $sub.css(position).appendTo($canvas)
-    $sub.show()
+    @el.css(position).appendTo($canvas)
+    @el.show()
+    # Close the menu when someone clicks outside the menu (locally mousedowns's are already squashed)
+    # Add a handler for when someone clicks outside the menu
+    that = @
+    Aloha.jQuery('body').one 'mousedown', () ->
+      setTimeout(that.close.bind(that), 10)
   
   close: () ->
     # TODO: Close their submenus
@@ -120,94 +98,94 @@ appmenu.MenuItem = class MenuItem extends MenuBase
     @isHidden = conf.hidden || false
     @subMenu = conf.subMenu || null
     # By default it's a right arrow, but the toolbar buttons use a down arrow
-    @subMenuChar = '\u25B6'
+    @subMenuChar = conf.subMenuChar || '\u25B6'
+    
+    # Create the element
+    @el = @_newDiv('menu-item')
 
-
-  _cssToggler: (val, clazz) ->
-    if @el
-      @el.addClass(clazz) if val
-      @el.removeClass(clazz) if not val
-
-  setChecked: (@isChecked) ->
-    @_cssToggler @isChecked, 'checked'
-    if @el
-      @el.children('.checked-icon').remove() # Always remove
-      if @isChecked
-        # Insert a div the the checkbox character
-        @_newDiv('checked-icon').append('\u2713').appendTo(@el)
-
-  setDisabled: (@isDisabled) ->
-    @_cssToggler @isDisabled, 'disabled'
-
-  setText: (@text) ->
-    if @el
-      @el.children('.text')[0].innerHTML = @text
-  
-  _addEvents: ($el) ->
-    that = @
+    # Add all the classes and child elements (ie icon, accelerator key)
+    if @iconCls?
+      @el.addClass('icon')
+      @_newDiv('menu-icon').addClass(@iconCls).appendTo(@el)
+    # @accel must go before @text otherwise shows up on next line
+    if @accel? then @_newDiv('accel').append(@accel).appendTo(@el)
+    @setDisabled(@isDisabled)
+    @setHidden(@isHidden)
+    @setChecked(@isChecked)
+    if @text? then @_newDiv('text').append(@text).appendTo(@el)
     if @subMenu?
-      $el.bind 'mouseenter', () ->
-        that._openSubMenu($el, true) # true == open-to-the-right
+      @el.addClass('submenu')
+      @_newDiv('submenu').appendTo(@el).append(@subMenuChar)
+    
+    # Add some event handlers
+    if @accel? then console.log("TODO: Adding hotkey handler #{ @accel }")
+    that = @
+    @el.bind 'click', (evt) ->
+      if not that.disabled and that.action
+        evt.preventDefault()
+        # TODO: Hide all menus
+        Aloha.jQuery('.menu').hide()
+        that.action(evt)
 
-  _openSubMenu: ($el, toTheRight = false) ->
+    # Add hover/selection
+    @el.bind 'mouseenter', () ->
+      that.el.addClass('selected')
+    @el.bind 'mouseleave', () ->
+      that.el.removeClass('selected')
+
+    @_addEvents()
+
+  
+  _addEvents: () ->
+    if @subMenu?
+      that = @
+      @el.bind 'mouseenter', () ->
+        that._openSubMenu(true) # true == open-to-the-right
+
+  _openSubMenu: (toTheRight = false) ->
     if @subMenu?
       # TODO: calculate the position of the submenu
-      offset = $el.offset()
-      $parent = $el.offsetParent()
+      offset = @el.offset()
+      $parent = @el.offsetParent()
       parentOffset = $parent.offset()
       top = offset.top - parentOffset.top + $parent.position().top
       left = offset.left - parentOffset.left + $parent.position().left
       if toTheRight
-        left += $el.outerWidth()
+        left += @el.outerWidth()
       else # below
-        top += $el.outerHeight()
+        top += @el.outerHeight()
       position = { top: top, left: left }
       @subMenu.open(position)
+
   _closeSubMenu: () ->
     @subMenu.close()
 
-  # Just generates the correct elements. Doesn't add mouseover/click events
-  render: () ->
-    if not @el?
-      @el = super()
 
-      @el.removeClass 'disabled hidden checked'
-      @el.children().remove()
-      
-      # Add all the classes and child elements (ie icon, accelerator key)
-      if @iconCls? 
-        @el.addClass('icon')
-        @_newDiv('menu-icon').addClass(@iconCls).appendTo(@el)
-      # @accel must go before @text otherwise shows up on next line
-      if @accel? then @_newDiv('accel').append(@accel).appendTo(@el)
-      @setDisabled(@isDisabled)
-      if @isHidden then @el.addClass('hidden')
-      @setChecked(@isChecked)
-      if @text? then @_newDiv('text').append(@text).appendTo(@el)
-      if @subMenu?
-        @el.addClass('submenu')
-        @_newDiv('submenu').appendTo(@el).append(@subMenuChar)
-      @el
-      
-      # Add some event handlers
-      if not @isDisabled
-        if @accel? then console.log("TODO: Adding hotkey handler #{ @accel }")
-        that = @
-        @el.bind 'click', (evt) ->
-          evt.preventDefault()
-          # TODO: Hide all menus
-          Aloha.jQuery('.menu').hide()
-          if that.action?
-            that.action(evt)
-  
-        @_addEvents(@el)
-    @el
-      
+  _cssToggler: (val, cls) ->
+    @el.addClass(cls) if val
+    @el.removeClass(cls) if not val
+
+  setChecked: (@isChecked) ->
+    @_cssToggler @isChecked, 'checked'
+    @el.children('.checked-icon').remove() # Always remove
+    if @isChecked
+      # Insert a div the the checkbox character
+      @_newDiv('checked-icon').append('\u2713').appendTo(@el)
+
+  setDisabled: (@isDisabled) ->
+    @_cssToggler @isDisabled, 'disabled'
+
+  setHidden: (@isHidden) ->
+    @_cssToggler @isHidden, 'hidden'
+
+  setText: (@text) ->
+    @el.children('.text')[0].innerHTML = @text
 
 appmenu.Separator = class Separator extends MenuItem
   constructor: () ->
     super(null, { disabled: true })
-    @addClass 'separator'
+    @el.addClass 'separator'
+
   _addEvents: () ->
 
 # ---- Specific to ToolBar ---
@@ -215,22 +193,22 @@ appmenu.Separator = class Separator extends MenuItem
 appmenu.ToolBar = class ToolBar extends Menu
   constructor: (items=[]) ->
     super items
-    @cls = 'tool-bar' # Don't add it to 'menu'
+    @el.addClass 'tool-bar' # Don't add it to 'menu'
+    @el.removeClass 'menu'
   
   close: () ->
     # Never close a toolbar
 
 appmenu.ToolButton = class ToolButton extends MenuItem
   constructor: (text, conf) ->
-    super(text, conf)
-    @addClass 'tool-button'
-    @toolTip = conf.toolTip || null
     # By default it's a right arrow, but the toolbar buttons use a down arrow
-    @subMenuChar = '\u25BC'
-
+    conf.subMenuChar = '\u25BC'
+    super(text, conf)
+    @el.addClass 'tool-button'
+    @toolTip = conf.toolTip || null
   
-  _addEvents: ($el) ->
-    tip = @_newDiv('tool-tip').appendTo($el)
+  _addEvents: () ->
+    tip = @_newDiv('tool-tip').appendTo(@el)
     if @toolTip?
       tip.append(@toolTip)
     else
@@ -240,14 +218,16 @@ appmenu.ToolButton = class ToolButton extends MenuItem
 
     if @subMenu?
       that = @
-      $el.bind 'click', () ->
-        that._openSubMenu($el, false) # false == open-below
+      @el.bind 'click', () ->
+        that._openSubMenu(false) # false == open-below
 
 # ---- Specific to MenuBar ---
 
 appmenu.MenuBar = class MenuBar extends Menu
-  constructor: (@items) ->
-    @cls = 'menu-bar' # Don't add it to 'menu'
+  constructor: (items) ->
+    super(items)
+    @el.addClass 'menu-bar'
+    @el.removeClass 'menu' # Don't treat the menubar as a menu
   
   close: () ->
     # Cannot be closed
@@ -256,15 +236,14 @@ appmenu.MenuBar = class MenuBar extends Menu
 appmenu.MenuButton = class MenuButton extends MenuItem
   constructor: (text, subMenu) ->
     super(text, { subMenu: subMenu })
-    @addClass 'menu-button'
+    @el.addClass 'menu-button'
 
-  _addEvents: ($el) ->
+  _addEvents: () ->
     if @subMenu?
       that = @
       # Open the menu on click
-      $el.bind 'click', (evt) ->
-        evt.preventDefault()
-        that._openSubMenu($el, false) # false == open-below
+      @el.bind 'click', (evt) ->
+        that._openSubMenu(false) # false == open-below
 
 
 # ---- Custom MenuItems and Menus ---
@@ -276,8 +255,7 @@ class appmenu.custom.Heading extends MenuItem
   _newDiv: (cls) ->
     # HACK: Only override the text div
     if cls == 'text'
-      $el = Aloha.jQuery(@markup)
-      $el.addClass(cls)
+      $el = super(cls, @markup)
       $el.addClass('custom-heading')
       $el
     else

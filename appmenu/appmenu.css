@@ -17,12 +17,12 @@
   padding: 5px;
   cursor: pointer;
 }
-.tool-bar > .tool-button:hover {
+.tool-bar > .tool-button.selected {
   opacity: 1.0;
   border: 1px solid #ccc;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 }
-.tool-bar > .tool-button.disabled:hover {
+.tool-bar > .tool-button.disabled.selected {
   border: 1px solid transparent;
 }
 .tool-bar > .tool-button.checked {
@@ -66,13 +66,13 @@
   white-space: nowrap;
   position: relative;
 }
-.menu-item:hover {
+.menu-item.selected {
   background-color: #eee;
 }
 .menu-item.disabled {
   opacity: 0.3;
 }
-.menu-item.disabled:hover {
+.menu-item.disabled.selected {
   background-color: inherit;
 }
 .menu-item > .accel {
@@ -86,7 +86,7 @@
   top: 8px;
   opacity: 0.5;
 }
-.menu-item > .submenu:hover {
+.menu-item > .submenu.selected {
   opacity: 1.0;
 }
 .menu-icon {
