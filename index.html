@@ -55,6 +55,9 @@ Aloha.settings.bundles = {
 	<link rel="stylesheet" type="text/css" href="./collab.css" />
   <script src="./collab.js"></script>
 
+  <!-- Provide a hotkey handler -->
+  <script>jQuery = Aloha.jQuery; // Set window.jQuery because hotkeys bind to it</script>
+  <script src="lib/jquery.hotkeys.js"></script>
 
   <!-- These are the CSS/Javascript files that aren't written as Aloha Plugins -->
 	<link rel="stylesheet" type="text/css" href="./page.css" />
