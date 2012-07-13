@@ -81,7 +81,7 @@ appmenu.Menu = class Menu extends MenuBase
       setTimeout(that.close.bind(that), 10)
   
   close: () ->
-    # TODO: Close their submenus
+    # Close the submenus
     for item in @items
       if item.subMenu
         item.subMenu.close()
@@ -118,8 +118,13 @@ appmenu.MenuItem = class MenuItem extends MenuBase
       @_newDiv('submenu').appendTo(@el).append(@subMenuChar)
     
     # Add some event handlers
-    if @accel? then console.log("TODO: Adding hotkey handler #{ @accel }")
     that = @
+    if @accel?
+      console.log("TODO: Adding hotkey handler #{ @accel }")
+      Aloha.jQuery('body').bind 'keydown', @accel.toLowerCase(), (evt) ->
+        if not that.isDisabled and that.action
+          that.action evt
+
     @el.bind 'click', (evt) ->
       if not that.disabled and that.action
         evt.preventDefault()

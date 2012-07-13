@@ -161,10 +161,13 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
         this.el.addClass('submenu');
         this._newDiv('submenu').appendTo(this.el).append(this.subMenuChar);
       }
+      that = this;
       if (this.accel != null) {
         console.log("TODO: Adding hotkey handler " + this.accel);
+        Aloha.jQuery('body').bind('keydown', this.accel.toLowerCase(), function(evt) {
+          if (!that.isDisabled && that.action) return that.action(evt);
+        });
       }
-      that = this;
       this.el.bind('click', function(evt) {
         if (!that.disabled && that.action) {
           evt.preventDefault();

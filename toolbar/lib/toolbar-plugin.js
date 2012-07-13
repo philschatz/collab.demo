@@ -3,7 +3,20 @@
   define(["aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!format/nls/i18n", "i18n!aloha/nls/i18n", "aloha/console", "css!toolbar/css/toolbar.css"], function(Aloha, Plugin, jQuery, FloatingMenu, i18n, i18nCore) {
     var CONTAINER_JQUERY, FloatingMenu_addButton, enabledButtons, toolbar;
     CONTAINER_JQUERY = jQuery('.toolbar') || jQuery('<div></div>').addClass('toolbar-container').appendTo('body');
-    enabledButtons = ["b", "i", "s", "sub", "sup", "quote", "ul", "ol", "indent-list", "outdent-list", "insertLink", "removeLink"];
+    enabledButtons = {
+      'b': 'Ctrl+B',
+      'i': 'Ctrl+I',
+      's': 'Ctrl+Shift+S',
+      'sub': 'Ctrl+.',
+      'sup': 'Ctrl+,',
+      'quote': "Ctrl+\'",
+      'ul': 'Ctrl+*',
+      'ol': 'Ctrl+&',
+      'indent-list': 'Tab',
+      'outdent-list': 'Shift+Tab',
+      'insertLink': 'Ctrl+K',
+      'removeLink': 'Ctrl+Shift+K'
+    };
     window.toolbar = toolbar = new appmenu.ToolBar();
     toolbar.el.appendTo(CONTAINER_JQUERY);
     FloatingMenu_addButton = function(scope, button, tab, group) {
@@ -11,6 +24,7 @@
       btn = new appmenu.ToolButton(button.name, {
         iconCls: button.iconClass,
         toolTip: button.name,
+        accel: enabledButtons[button.name],
         action: function(evt) {
           evt.preventDefault();
           button.btnEl = {
@@ -32,7 +46,7 @@
       button.enable = function() {
         return btn.setDisabled(false);
       };
-      if (enabledButtons.indexOf(button.name) < 0) return;
+      if (!enabledButtons[button.name]) return;
       return toolbar.append(btn);
     };
     /*

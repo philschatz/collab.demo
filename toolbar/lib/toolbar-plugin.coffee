@@ -1,7 +1,19 @@
 define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!format/nls/i18n", "i18n!aloha/nls/i18n", "aloha/console", "css!toolbar/css/toolbar.css" ], (Aloha, Plugin, jQuery, FloatingMenu, i18n, i18nCore) ->
 
   CONTAINER_JQUERY = jQuery('.toolbar') || jQuery('<div></div>').addClass('toolbar-container').appendTo('body')
-  enabledButtons = [ "b", "i", "s", "sub", "sup", "quote", "ul", "ol", "indent-list", "outdent-list", "insertLink", "removeLink" ]
+  enabledButtons =
+    'b': 'Ctrl+B'
+    'i': 'Ctrl+I'
+    's': 'Ctrl+Shift+S'
+    'sub': 'Ctrl+.'
+    'sup': 'Ctrl+,'
+    'quote': "Ctrl+\'"
+    'ul': 'Ctrl+*'
+    'ol': 'Ctrl+&'
+    'indent-list': 'Tab'
+    'outdent-list': 'Shift+Tab'
+    'insertLink': 'Ctrl+K'
+    'removeLink': 'Ctrl+Shift+K'
 
   window.toolbar = toolbar = new appmenu.ToolBar()
   toolbar.el.appendTo CONTAINER_JQUERY
@@ -12,6 +24,7 @@ define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!fo
     btn = new appmenu.ToolButton button.name, 
       iconCls: button.iconClass
       toolTip: button.name
+      accel: enabledButtons[button.name]
       action: (evt) ->
         evt.preventDefault() # Don't lose focus from the editor
         # ExtJS hack. tableCreate uses this DOM element to create a dialog box
@@ -36,7 +49,7 @@ define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!fo
     # Aloha still calls functions on the Aloha.ui.Button and expects them to
     # have been rendered somewhere so we override the functions and just not
     # include the button so Aloha doesn't fail when trying to update the ExtButton
-    return  if enabledButtons.indexOf(button.name) < 0
+    return  if not enabledButtons[button.name]
 
     toolbar.append btn
 
