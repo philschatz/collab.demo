@@ -8,8 +8,8 @@ define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!fo
     'sub': 'Ctrl+.'
     'sup': 'Ctrl+,'
     'quote': "Ctrl+\'"
-    'ul': 'Ctrl+*'
-    'ol': 'Ctrl+&'
+    'ul': 'Ctrl+Shift+7'
+    'ol': 'Ctrl+Shift+6'
     'indent-list': 'Tab'
     'outdent-list': 'Shift+Tab'
     'insertLink': 'Ctrl+K'
@@ -75,7 +75,7 @@ define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!fo
         'h2': 'Heading 2'
         'h3': 'Heading 3'
 
-      headingButtons = (new appmenu.custom.Heading("<#{ h } />", labels[h], {action: applyHeading }) for h in order)
+      headingButtons = (new appmenu.custom.Heading("<#{ h } />", labels[h], {accel: "Ctrl+#{ h.charAt(1) }", action: applyHeading }) for h in order)
       
       headingsButton = new appmenu.ToolButton("Heading 1", {subMenu: new appmenu.Menu(headingButtons)})
       toolbar.append(headingsButton)

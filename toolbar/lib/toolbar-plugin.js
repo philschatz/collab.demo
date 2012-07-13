@@ -10,8 +10,8 @@
       'sub': 'Ctrl+.',
       'sup': 'Ctrl+,',
       'quote': "Ctrl+\'",
-      'ul': 'Ctrl+*',
-      'ol': 'Ctrl+&',
+      'ul': 'Ctrl+Shift+7',
+      'ol': 'Ctrl+Shift+6',
       'indent-list': 'Tab',
       'outdent-list': 'Shift+Tab',
       'insertLink': 'Ctrl+K',
@@ -77,6 +77,7 @@
           for (_i = 0, _len = order.length; _i < _len; _i++) {
             h = order[_i];
             _results.push(new appmenu.custom.Heading("<" + h + " />", labels[h], {
+              accel: "Ctrl+" + (h.charAt(1)),
               action: applyHeading
             }));
           }

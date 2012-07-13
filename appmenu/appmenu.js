@@ -150,6 +150,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
       }
       if (this.accel != null) {
         this._newDiv('accel').append(this.accel).appendTo(this.el);
+        this.el.attr('title', "" + this.text + " (" + this.accel + ")");
       }
       this.setDisabled(this.isDisabled);
       this.setHidden(this.isHidden);

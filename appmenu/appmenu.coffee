@@ -108,7 +108,10 @@ appmenu.MenuItem = class MenuItem extends MenuBase
       @el.addClass('icon')
       @_newDiv('menu-icon').addClass(@iconCls).appendTo(@el)
     # @accel must go before @text otherwise shows up on next line
-    if @accel? then @_newDiv('accel').append(@accel).appendTo(@el)
+    if @accel?
+      @_newDiv('accel').append(@accel).appendTo(@el)
+      # Also, make it the tooltip for now
+      @el.attr 'title', "#{ @text } (#{ @accel })"
     @setDisabled(@isDisabled)
     @setHidden(@isHidden)
     @setChecked(@isChecked)
