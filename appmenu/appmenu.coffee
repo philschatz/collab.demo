@@ -42,6 +42,12 @@ MenuBase = class MenuBase
   _newDiv: (cls) ->
     $el = Aloha.jQuery('<div></div>')
     $el.addClass(cls) if cls?
+    
+    # Don't propagate the mousedown so we don't lose focus from the editable area
+    $el.bind 'mousedown', (evt) ->
+      evt.stopPropagation()
+      evt.preventDefault()
+    
     $el
   
   render: () ->
@@ -69,14 +75,11 @@ appmenu.Menu = class Menu extends MenuBase
       @_closeEverythingBut(item, $item)
       @el.append($item)
 
-    # Close the menu on second click
+    # Close the menu when someone clicks outside the menu (locally mousedowns's are already squashed)
     # Add a handler for when someone clicks outside the menu
     that = @
-    Aloha.jQuery('body').one 'mouseup', () ->
-      setTimeout( () ->
-        Aloha.jQuery('body').one 'click', () ->
-          setTimeout(that.close.bind(that), 10)
-      , 10)
+    Aloha.jQuery('body').one 'mousedown', () ->
+      setTimeout(that.close.bind(that), 10)
     @el
 
   _closeEverythingBut: (item, $item) ->
@@ -190,7 +193,7 @@ appmenu.MenuItem = class MenuItem extends MenuBase
       if not @isDisabled
         if @accel? then console.log("TODO: Adding hotkey handler #{ @accel }")
         that = @
-        @el.bind 'mousedown', (evt) ->
+        @el.bind 'click', (evt) ->
           evt.preventDefault()
           # TODO: Hide all menus
           Aloha.jQuery('.menu').hide()
@@ -237,7 +240,7 @@ appmenu.ToolButton = class ToolButton extends MenuItem
 
     if @subMenu?
       that = @
-      $el.bind 'mousedown', () ->
+      $el.bind 'click', () ->
         that._openSubMenu($el, false) # false == open-below
 
 # ---- Specific to MenuBar ---
@@ -259,7 +262,7 @@ appmenu.MenuButton = class MenuButton extends MenuItem
     if @subMenu?
       that = @
       # Open the menu on click
-      $el.bind 'mousedown', (evt) ->
+      $el.bind 'click', (evt) ->
         evt.preventDefault()
         that._openSubMenu($el, false) # false == open-below
 

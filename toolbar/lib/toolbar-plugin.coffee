@@ -1,8 +1,6 @@
 define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!format/nls/i18n", "i18n!aloha/nls/i18n", "aloha/console", "css!toolbar/css/toolbar.css" ], (Aloha, Plugin, jQuery, FloatingMenu, i18n, i18nCore) ->
 
   CONTAINER_JQUERY = jQuery('.toolbar') || jQuery('<div></div>').addClass('toolbar-container').appendTo('body')
-  # Changed every time selectionChanged event is fired
-  rangeHack = null
   enabledButtons = [ "b", "i", "s", "sub", "sup", "quote", "ul", "ol", "indent-list", "outdent-list", "insertLink", "removeLink" ]
 
   window.toolbar = toolbar = new appmenu.ToolBar()
@@ -16,7 +14,6 @@ define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!fo
       toolTip: button.name
       action: (evt) ->
         evt.preventDefault() # Don't lose focus from the editor
-        Aloha.Selection.rangeObject = rangeHack
         # ExtJS hack. tableCreate uses this DOM element to create a dialog box
         button.btnEl =
           dom: @el[0]
@@ -74,7 +71,6 @@ define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!fo
       # Keep track of the range because Aloha.Selection.obj seems to go {} sometimes
       Aloha.bind "aloha-selection-changed", (event, rangeObject) ->
         # Squirrel away the range because clicking the button changes focus and removed the range
-        rangeHack = rangeObject
         $el = Aloha.jQuery(rangeObject.startContainer)
         for h, i in order
           isActive = $el.parents(h).length > 0
@@ -82,10 +78,6 @@ define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!fo
           # Update the toolbar to show the current heading level
           if isActive
             headingsButton.setText labels[h]
-
-      Aloha.bind "focus", (event, rangeObject) ->
-        # Squirrel away the range because clicking the button changes focus and removed the range
-        rangeHack = rangeObject
 
     ###
      toString method

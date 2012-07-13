@@ -52,6 +52,10 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
       var $el;
       $el = Aloha.jQuery('<div></div>');
       if (cls != null) $el.addClass(cls);
+      $el.bind('mousedown', function(evt) {
+        evt.stopPropagation();
+        return evt.preventDefault();
+      });
       return $el;
     };
 
@@ -92,12 +96,8 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
         this.el.append($item);
       }
       that = this;
-      Aloha.jQuery('body').one('mouseup', function() {
-        return setTimeout(function() {
-          return Aloha.jQuery('body').one('click', function() {
-            return setTimeout(that.close.bind(that), 10);
-          });
-        }, 10);
+      Aloha.jQuery('body').one('mousedown', function() {
+        return setTimeout(that.close.bind(that), 10);
       });
       return this.el;
     };
@@ -261,7 +261,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
             console.log("TODO: Adding hotkey handler " + this.accel);
           }
           that = this;
-          this.el.bind('mousedown', function(evt) {
+          this.el.bind('click', function(evt) {
             evt.preventDefault();
             Aloha.jQuery('.menu').hide();
             if (that.action != null) return that.action(evt);
@@ -331,7 +331,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
       }
       if (this.subMenu != null) {
         that = this;
-        return $el.bind('mousedown', function() {
+        return $el.bind('click', function() {
           return that._openSubMenu($el, false);
         });
       }
@@ -371,7 +371,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
       var that;
       if (this.subMenu != null) {
         that = this;
-        return $el.bind('mousedown', function(evt) {
+        return $el.bind('click', function(evt) {
           evt.preventDefault();
           return that._openSubMenu($el, false);
         });

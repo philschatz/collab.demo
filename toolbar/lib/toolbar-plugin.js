@@ -1,9 +1,8 @@
 (function() {
 
   define(["aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!format/nls/i18n", "i18n!aloha/nls/i18n", "aloha/console", "css!toolbar/css/toolbar.css"], function(Aloha, Plugin, jQuery, FloatingMenu, i18n, i18nCore) {
-    var CONTAINER_JQUERY, FloatingMenu_addButton, enabledButtons, rangeHack, toolbar;
+    var CONTAINER_JQUERY, FloatingMenu_addButton, enabledButtons, toolbar;
     CONTAINER_JQUERY = jQuery('.toolbar') || jQuery('<div></div>').addClass('toolbar-container').appendTo('body');
-    rangeHack = null;
     enabledButtons = ["b", "i", "s", "sub", "sup", "quote", "ul", "ol", "indent-list", "outdent-list", "insertLink", "removeLink"];
     window.toolbar = toolbar = new appmenu.ToolBar();
     toolbar.render().appendTo(CONTAINER_JQUERY);
@@ -14,7 +13,6 @@
         toolTip: button.name,
         action: function(evt) {
           evt.preventDefault();
-          Aloha.Selection.rangeObject = rangeHack;
           button.btnEl = {
             dom: this.el[0]
           };
@@ -75,9 +73,8 @@
         });
         toolbar.append(headingsButton);
         toolbar.append(new appmenu.Separator());
-        Aloha.bind("aloha-selection-changed", function(event, rangeObject) {
+        return Aloha.bind("aloha-selection-changed", function(event, rangeObject) {
           var $el, h, i, isActive, _len, _results;
-          rangeHack = rangeObject;
           $el = Aloha.jQuery(rangeObject.startContainer);
           _results = [];
           for (i = 0, _len = order.length; i < _len; i++) {
@@ -91,9 +88,6 @@
             }
           }
           return _results;
-        });
-        return Aloha.bind("focus", function(event, rangeObject) {
-          return rangeHack = rangeObject;
         });
       },
       /*
