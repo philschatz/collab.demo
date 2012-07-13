@@ -345,12 +345,24 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
     MenuButton.prototype._addEvents = function() {
       var that;
-      if (this.subMenu != null) {
-        that = this;
-        return this.el.bind('click', function(evt) {
-          return that._openSubMenu(false);
-        });
-      }
+      that = this;
+      this.el.bind('click', function(evt) {
+        return that._openSubMenu(false);
+      });
+      return this.el.bind('mouseenter', function(evt) {
+        var openMenu, _i, _len, _ref, _results;
+        _ref = Aloha.jQuery('.menu');
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          openMenu = _ref[_i];
+          if (openMenu !== that.el[0]) {
+            _results.push(Aloha.jQuery(openMenu).hide());
+          } else {
+            _results.push(void 0);
+          }
+        }
+        return _results;
+      });
     };
 
     return MenuButton;

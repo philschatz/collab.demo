@@ -239,11 +239,16 @@ appmenu.MenuButton = class MenuButton extends MenuItem
     @el.addClass 'menu-button'
 
   _addEvents: () ->
-    if @subMenu?
-      that = @
-      # Open the menu on click
-      @el.bind 'click', (evt) ->
-        that._openSubMenu(false) # false == open-below
+    that = @
+    # Open the menu on click
+    @el.bind 'click', (evt) ->
+      that._openSubMenu(false) # false == open-below
+
+    # On mouseover close all other menus (except submenu)
+    @el.bind 'mouseenter', (evt) ->
+      for openMenu in Aloha.jQuery('.menu')
+        if openMenu != that.el[0]
+          Aloha.jQuery(openMenu).hide()
 
 
 # ---- Custom MenuItems and Menus ---
