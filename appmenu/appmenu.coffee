@@ -57,7 +57,7 @@ MenuBase = class MenuBase
 
 appmenu.Menu = class Menu extends MenuBase
   constructor: (@items=[]) ->
-    @addClass 'menu'
+    super 'menu'
   
   render: () ->
     if not @el?
@@ -104,7 +104,7 @@ appmenu.Menu = class Menu extends MenuBase
 
 appmenu.MenuItem = class MenuItem extends MenuBase
   constructor: (@text, conf = {}) ->
-    @addClass 'menu-item'
+    super 'menu-item'
     @action = conf.action || null
     @iconCls = conf.iconCls || null
     @accel = conf.accel || null
@@ -146,8 +146,10 @@ appmenu.MenuItem = class MenuItem extends MenuBase
     if @subMenu?
       # TODO: calculate the position of the submenu
       offset = $el.offset()
-      top = $el.scrollTop()
-      left = $el.scrollLeft()
+      $parent = $el.offsetParent()
+      parentOffset = $parent.offset()
+      top = offset.top - parentOffset.top + $parent.position().top
+      left = offset.left - parentOffset.left + $parent.position().left
       if toTheRight
         left += $el.outerWidth()
       else # below
@@ -239,6 +241,9 @@ appmenu.ToolButton = class ToolButton extends MenuItem
 appmenu.MenuBar = class MenuBar extends Menu
   constructor: (@items) ->
     @cls = 'menu-bar' # Don't add it to 'menu'
+  
+  close: () ->
+    # Cannot be closed
   
 
 appmenu.MenuButton = class MenuButton extends MenuItem

@@ -77,7 +77,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
     function Menu(items) {
       this.items = items != null ? items : [];
-      this.addClass('menu');
+      Menu.__super__.constructor.call(this, 'menu');
     }
 
     Menu.prototype.render = function() {
@@ -154,7 +154,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
     function MenuItem(text, conf) {
       this.text = text;
       if (conf == null) conf = {};
-      this.addClass('menu-item');
+      MenuItem.__super__.constructor.call(this, 'menu-item');
       this.action = conf.action || null;
       this.iconCls = conf.iconCls || null;
       this.accel = conf.accel || null;
@@ -204,12 +204,14 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
     };
 
     MenuItem.prototype._openSubMenu = function($el, toTheRight) {
-      var left, offset, position, top;
+      var $parent, left, offset, parentOffset, position, top;
       if (toTheRight == null) toTheRight = false;
       if (this.subMenu != null) {
         offset = $el.offset();
-        top = $el.scrollTop();
-        left = $el.scrollLeft();
+        $parent = $el.offsetParent();
+        parentOffset = $parent.offset();
+        top = offset.top - parentOffset.top + $parent.position().top;
+        left = offset.left - parentOffset.left + $parent.position().left;
         if (toTheRight) {
           left += $el.outerWidth();
         } else {
@@ -344,6 +346,8 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
       this.items = items;
       this.cls = 'menu-bar';
     }
+
+    MenuBar.prototype.close = function() {};
 
     return MenuBar;
 
