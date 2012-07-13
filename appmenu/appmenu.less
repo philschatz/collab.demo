@@ -19,12 +19,12 @@
     padding: 5px;
     cursor: pointer;
 
-    &:hover {
+    &.selected {
       opacity: 1.0;
       border: 1px solid #ccc;
       box-shadow: 0 1px 1px rgba(0, 0, 0, .1);
     }
-    &.disabled:hover { border: 1px solid transparent; }
+    &.disabled.selected { border: 1px solid transparent; }
     &.checked { background-color: #eee; opacity: 1.0; border: 1px solid #ccc; }
     &> .checked-icon { display: none; }
 
@@ -58,12 +58,12 @@
   white-space: nowrap;
   position: relative; // For the submenu icon
 
-  &:hover {
+  &.selected {
     background-color: #eee;
   }
 
   &.disabled { opacity: 0.3; }
-  &.disabled:hover { background-color: inherit; }
+  &.disabled.selected { background-color: inherit; }
   
   &> .accel { position: absolute; right: 5px; }
   &> .submenu {
@@ -73,7 +73,7 @@
     top: 8px;
     opacity: 0.5;
     
-    &:hover {
+    &.selected {
       opacity: 1.0;
     }
   }

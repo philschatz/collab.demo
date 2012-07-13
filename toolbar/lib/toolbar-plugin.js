@@ -5,7 +5,7 @@
     CONTAINER_JQUERY = jQuery('.toolbar') || jQuery('<div></div>').addClass('toolbar-container').appendTo('body');
     enabledButtons = ["b", "i", "s", "sub", "sup", "quote", "ul", "ol", "indent-list", "outdent-list", "insertLink", "removeLink"];
     window.toolbar = toolbar = new appmenu.ToolBar();
-    toolbar.render().appendTo(CONTAINER_JQUERY);
+    toolbar.el.appendTo(CONTAINER_JQUERY);
     FloatingMenu_addButton = function(scope, button, tab, group) {
       var btn;
       btn = new appmenu.ToolButton(button.name, {
