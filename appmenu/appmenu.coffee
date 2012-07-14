@@ -109,9 +109,10 @@ appmenu.MenuItem = class MenuItem extends MenuBase
       @_newDiv('menu-icon').addClass(@iconCls).appendTo(@el)
     # @accel must go before @text otherwise shows up on next line
     if @accel?
-      @_newDiv('accel').append(@accel).appendTo(@el)
+      translated = @accel.replace('Shift+', '⇧').replace('Meta+', '⌘')
+      @_newDiv('accel').append(translated).appendTo(@el)
       # Also, make it the tooltip for now
-      @el.attr 'title', "#{ @text } (#{ @accel })"
+      @el.attr 'title', "#{ @text } (#{ translated })"
     @setDisabled(@isDisabled)
     @setHidden(@isHidden)
     @setChecked(@isChecked)

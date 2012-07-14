@@ -131,7 +131,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
     __extends(MenuItem, _super);
 
     function MenuItem(text, conf) {
-      var that;
+      var that, translated;
       this.text = text;
       if (conf == null) conf = {};
       MenuItem.__super__.constructor.call(this, 'menu-item');
@@ -149,8 +149,9 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
         this._newDiv('menu-icon').addClass(this.iconCls).appendTo(this.el);
       }
       if (this.accel != null) {
-        this._newDiv('accel').append(this.accel).appendTo(this.el);
-        this.el.attr('title', "" + this.text + " (" + this.accel + ")");
+        translated = this.accel.replace('Shift+', '⇧').replace('Meta+', '⌘');
+        this._newDiv('accel').append(translated).appendTo(this.el);
+        this.el.attr('title', "" + this.text + " (" + translated + ")");
       }
       this.setDisabled(this.isDisabled);
       this.setHidden(this.isHidden);
