@@ -7,3 +7,6 @@
   z-index: -1;
 }
 
+.remote-selected {
+  opacity: 0.5;
+}
