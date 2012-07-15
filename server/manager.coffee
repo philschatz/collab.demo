@@ -74,8 +74,12 @@ module.exports = (app) ->
     # When a new user starts collaborating reset the doc
     socket.on 'document:reset', (nodes) ->
       # Remove all locks this user has
-      locks = {}
-      history = []
+      
+      # Can't just bind history to a new empty array because some functions have it stored in local vars
+      while history.length
+        history.shift()
+      for node of locks
+        delete locks[node]
       
       socket.broadcast.emit 'document:reset'
       emitAll('node:select', locks)

@@ -4,15 +4,21 @@
 Aloha.ready ->
   if window.io?
     $ = Aloha.jQuery
-    # Display the text 
-    $('.collaborate').show()
-    $('.collaborate a').bind 'mousedown', (evt) ->
-      evt.preventDefault()
-      window.collaborate window.socketUrl, $('.document')
-      $('.collaborate').hide()
 
-    window.collaborate = (url, $doc) ->
-      socket = io.connect url
+    $doc = $('.document')
+    shared =
+      socket: null # Shared between enable and reset
+      changeHandler: null
+
+    reset = () ->
+      shared.socket.emit 'document:reset'
+      $doc[0].innerHTML = '<h1>Heading</h1><h2>Sub Heading</h2><h3>Sub-Sub Heading</h3><p>Paragraph Text</p>'
+      shared.changeHandler(null, null)
+
+    enable = (evt, url) ->
+      
+      unless url? then url = prompt 'What is the collaboration server URL?', 'http://localhost:3001'
+      shared.socket = socket = io.connect url
     
       socket.on 'connect', () ->
         debugReceive = (command) ->
@@ -27,6 +33,8 @@ Aloha.ready ->
         debugReceive 'node:select'
         debugReceive 'node:operation'
     
+        $doc[0].innerHTML = ''
+        resetBtn.setDisabled false # Enable resetting of the document
     
         users = {} # This will be populated by active users
         me = null
@@ -54,21 +62,6 @@ Aloha.ready ->
         
         socket.on 'user:hello', (msg) ->
           me = msg
-          # Send a reset and then send the current document
-          els = $doc.children() # Save the children before deleting them with 'document:reset'
-          $doc[0].innerHTML = ''
-          socket.emit 'document:reset'
-          nextId = 0
-          for el in els
-            id ="id-#{ ++nextId }"
-            $(el).attr 'id', id
-            operation =
-              op: 'append'
-              node: id
-              context: null
-              html: el.outerHTML
-            socket.emit 'node:operation', operation
-            onOperation operation
     
         socket.on 'user:join', (msg) ->
           users[msg.user] = msg.color
@@ -106,40 +99,46 @@ Aloha.ready ->
     
         autoId = 0 # Incremented
         # Lock a node when selection changes
-        changeHandler = (event, rangeObject) ->
-          parent = $(rangeObject.startContainer).parents('*[id]').first()
-          if parent.length && $doc[0] != parent[0]
-            node = parent.attr('id')
-            socket.emit 'node:select', [ node ]
-            
-            # The selection also changes every time text is edited
-            socket.emit 'node:update', { node: node, html: parent[0].innerHTML }
-          else
-            # The user created a new element by pressing Enter
-            # Either it's a insertbefore or an append message
-            # Find the new node
+        shared.changeHandler = (event, rangeObject) ->
+          if rangeObject
+            parent = $(rangeObject.startContainer).parents('*[id]').first()
+            if parent.length && $doc[0] != parent[0]
+              node = parent.attr('id')
+              socket.emit 'node:select', [ node ]
+              
+              # The selection also changes every time text is edited
+              socket.emit 'node:update', { node: node, html: parent[0].innerHTML }
+
+          # If anything doesn't have @id's treat them as appends
+          # The user created a new element by pressing Enter
+          # Either it's a insertbefore or an append message
+          # Find the new node
+          for orphan in $doc.children('*:not([id])')
+            $orphan = $(orphan)
   
-            parent = $doc.children('*:not([id])').first()
             id = "auto-#{ me.user }-id#{ ++autoId }"
-            html = parent[0].outerHTML
-            parent.attr('id', id)
+            html = orphan.outerHTML
+            $orphan.attr('id', id)
   
-            # The user probably hit enter. so update the previous node          
-            socket.emit 'node:update',
-              node: parent.prev().attr 'id'
-              html: parent.prev()[0].innerHTML
+            # The user probably hit enter. so update the previous node
+            $prev = $orphan.prev('*[id]')
+            if $prev.length
+              socket.emit 'node:update',
+                node: $prev.attr 'id'
+                html: $prev[0].innerHTML
   
-  
-            next = parent.nextAll('*[id]').first()
-            if next.length
+            $next = $orphan.next('*[id]')
+            if $next.length
               op = 'insertbefore'
-              context = next.attr 'id'
+              context = $next.attr 'id'
             else
               op = 'append'
-              if $doc[0] = parent.parent()[0]
-                context = null
-              else 
-                context = parent.parent().attr 'id'
+              # For now, collab doesn't do nesting. append is always on the doc
+              context = null
+              #if $doc[0] = parent.parent()[0]
+              #  context = null
+              #else 
+              #  context = parent.parent().attr 'id'
             socket.emit 'node:operation'
               op: op
               node: id
@@ -147,12 +146,22 @@ Aloha.ready ->
               html: html
             socket.emit 'node:select', [ id ]
   
-        Aloha.bind "aloha-selection-changed", changeHandler
+        Aloha.bind "aloha-selection-changed", shared.changeHandler
         # On focus the cursor isn't available yet so fire the event after a period of time
-        Aloha.jQuery('.document').bind "focus", (evt) ->
+        $doc.bind "focus", (evt) ->
           setTimeout (() ->
             sel = rangy.getSelection()
             ranges = sel.getAllRanges()
             return  if ranges.length is 0
             rangeObject = ranges[0]
-            changeHandler evt, rangeObject), 10
+            shared.changeHandler evt, rangeObject), 10
+
+    resetBtn = new appmenu.MenuItem('Reset Document', {accel: 'Meta+Shift+E', action: reset, disabled: true})
+
+    window.menubar.append(new appmenu.MenuButton('Collaborate!', new appmenu.Menu([
+      new appmenu.MenuItem('Enable!', {accel: 'Meta+E', action: (evt) -> enable evt, 'http://boole.cnx.rice.edu:3001'})
+      resetBtn
+      new appmenu.Separator()
+      new appmenu.MenuItem('Enable localhost (dev)', {accel: 'Meta+Shift+L', action: (evt) -> enable evt, 'http://localhost:3001'})
+      new appmenu.MenuItem('Enable...', {action: enable})
+    ])))

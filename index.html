@@ -9,8 +9,6 @@
 
   <!-- These CSS/javascript files depend on where Aloha is located -->
 	<link rel="stylesheet" type="text/css" href="../Aloha-Editor/src/css/aloha.css" />
-  <!-- Use local paths to sprite files -->
-	<link rel="stylesheet" type="text/css" href="./toolbar/css/toolbar-icons.css" />
   
 <script type="text/javascript">
 window.Aloha = window.Aloha || {};
@@ -102,26 +100,51 @@ Aloha.ready(function() {
 </script>
 
 
-<div class="collaborate" style="display: none;">
+<script>
+
+// Add in some menus. Make menubar global so collab can hook in some buttons
+window.menubar = new appmenu.MenuBar([
+  new appmenu.MenuButton('File', new appmenu.Menu([
+    new appmenu.MenuItem('New', {subMenu: new appmenu.Menu([
+      new appmenu.MenuItem('Module', {accel: 'Ctrl+N', action: function() {alert("TODO: Create a new module"); } }),
+      new appmenu.MenuItem('Collection', {accel: 'Ctrl+Shift+N', disabled: true})
+    ])}), // End "New"
+    new appmenu.Separator(),
+    new appmenu.MenuItem('Save', {disabled: true}),
+    new appmenu.MenuItem('Print', {accel: 'Ctrl+P', disabled: true})
+  ]))
+]);
+
+// Then add in another menu
+menubar.append(new appmenu.MenuButton('Edit', new appmenu.Menu([
+  new appmenu.MenuItem('Example buttons', {disabled: true}),
+  new appmenu.MenuItem('Not useful yet', {disabled: true}),
+  new appmenu.Separator(),
+  new appmenu.MenuItem('Cut', {accel: 'Ctrl+X'}),
+  new appmenu.MenuItem('Copy', {accel: 'Ctrl+C'}),
+  new appmenu.MenuItem('Paste', {accel: 'Ctrl+V'}),
+  new appmenu.Separator(),
+  new appmenu.MenuItem('Disabled Item', {disabled: true, iconCls: 'aloha-button aloha-button-b'}),
+  new appmenu.MenuItem('Checked Item', {checked: true}),
+]) )); // End "Edit"
+
+
+// Make the document editable
+Aloha.ready(function() {
+  var $document = Aloha.jQuery('.document');
+  $document.aloha();
+  // Every 30 seconds update the textarea with the HTML
+  setInterval(function() {
+    Aloha.jQuery('.source').val($document.html().trim());
+  }, 10000);
   
-  <p>Click to <a class="collaborate" href="#">Enable Collaboration</a></p>
+  // Render the menu
+  menubar.el.appendTo('.menubar');
   
-  <p>To see the collaboration (assuming the collaboration server is running) do the following:</p>
-  <ol>
-    <li>Open this page in a new window or different browser</li>
-    <li>In the other window click the "Enable Collaboration" button as well</li>
-    <li>The page should reload with an example document</li>
-    <li>Click around (without making changes) and notice the other window updates</li>
-    <li>After a couple of clicks, change the text by:
-      <ul>
-        <li>Typing in new text</li>
-        <li>Making some text bold/italic</li>
-        <li>Deleting characters</li>
-      </ul>
-    </li>
-    <li>Note: Cut, Copy, Paste, and Undo don't work collaboratively yet</li>
-  </ol>
-</div>
+});
+</script>
+
+<textarea class="source"></textarea>
 
 </body>
 
