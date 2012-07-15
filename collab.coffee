@@ -19,6 +19,7 @@ Aloha.ready ->
           socket.on command, (message) ->
             console.log 'Received: ' + command, message
         
+        debugReceive 'document.reset'
         debugReceive 'user:hello'
         debugReceive 'user:list'
         debugReceive 'user:join'

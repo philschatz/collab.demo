@@ -124,7 +124,6 @@ appmenu.MenuItem = class MenuItem extends MenuBase
     # Add some event handlers
     that = @
     if @accel?
-      console.log("TODO: Adding hotkey handler #{ @accel }")
       Aloha.jQuery('body').bind 'keydown', @accel.toLowerCase(), (evt) ->
         if not that.isDisabled and that.action
           that.action evt

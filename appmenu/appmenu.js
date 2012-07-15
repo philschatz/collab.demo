@@ -165,7 +165,6 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
       }
       that = this;
       if (this.accel != null) {
-        console.log("TODO: Adding hotkey handler " + this.accel);
         Aloha.jQuery('body').bind('keydown', this.accel.toLowerCase(), function(evt) {
           if (!that.isDisabled && that.action) return that.action(evt);
         });
