@@ -29,7 +29,11 @@
           var autoId, debugReceive, me, onOperation, users;
           debugReceive = function(command) {
             return socket.on(command, function(message) {
-              return console.log('Received: ' + command, message);
+              if (command === 'node:operation') {
+                return console.log('Received: OP: ' + message.op, message);
+              } else {
+                return console.log('Received: ' + command, message);
+              }
             });
           };
           debugReceive('document.reset');
@@ -39,6 +43,7 @@
           debugReceive('user:leave');
           debugReceive('node:select');
           debugReceive('node:operation');
+          debugReceive('node:update');
           $doc[0].innerHTML = '';
           resetBtn.setDisabled(false);
           users = {};
@@ -102,7 +107,9 @@
           });
           socket.on('node:update', function(msg) {
             return setTimeout(function() {
-              return $('#' + msg.node)[0].innerHTML = msg.html;
+              var n;
+              n = $('#' + msg.node);
+              if (n.length) return n[0].innerHTML = msg.html;
             }, 100);
           });
           autoId = 0;
@@ -111,12 +118,14 @@
             if (rangeObject) {
               parent = $(rangeObject.startContainer).parents('*[id]').first();
               if (parent.length && $doc[0] !== parent[0]) {
-                node = parent.attr('id');
-                socket.emit('node:select', [node]);
-                socket.emit('node:update', {
-                  node: node,
-                  html: parent[0].innerHTML
-                });
+                if (parent.parents($doc)) {
+                  node = parent.attr('id');
+                  socket.emit('node:select', [node]);
+                  socket.emit('node:update', {
+                    node: node,
+                    html: parent[0].innerHTML
+                  });
+                }
               }
             }
             _ref = $doc.children('*:not([id])');

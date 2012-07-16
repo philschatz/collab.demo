@@ -23,7 +23,10 @@ Aloha.ready ->
       socket.on 'connect', () ->
         debugReceive = (command) ->
           socket.on command, (message) ->
-            console.log 'Received: ' + command, message
+            if command == 'node:operation'
+              console.log 'Received: OP: ' + message.op, message
+            else
+              console.log 'Received: ' + command, message
         
         debugReceive 'document.reset'
         debugReceive 'user:hello'
@@ -32,6 +35,7 @@ Aloha.ready ->
         debugReceive 'user:leave'
         debugReceive 'node:select'
         debugReceive 'node:operation'
+        debugReceive 'node:update'
     
         $doc[0].innerHTML = ''
         resetBtn.setDisabled false # Enable resetting of the document
@@ -94,7 +98,9 @@ Aloha.ready ->
     
         socket.on 'node:update', (msg) ->
           setTimeout( () ->
-            $('#' + msg.node)[0].innerHTML = msg.html
+            n = $('#' + msg.node)
+            if n.length
+              n[0].innerHTML = msg.html
           , 100)
     
         autoId = 0 # Incremented
@@ -103,11 +109,13 @@ Aloha.ready ->
           if rangeObject
             parent = $(rangeObject.startContainer).parents('*[id]').first()
             if parent.length && $doc[0] != parent[0]
-              node = parent.attr('id')
-              socket.emit 'node:select', [ node ]
+              # make sure the element is a descendant of the document
+              if parent.parents($doc)
+                node = parent.attr('id')
+                socket.emit 'node:select', [ node ]
               
-              # The selection also changes every time text is edited
-              socket.emit 'node:update', { node: node, html: parent[0].innerHTML }
+                # The selection also changes every time text is edited
+                socket.emit 'node:update', { node: node, html: parent[0].innerHTML }
 
           # If anything doesn't have @id's treat them as appends
           # The user created a new element by pressing Enter
