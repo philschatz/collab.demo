@@ -16,7 +16,7 @@
       };
       reset = function() {
         shared.socket.emit('document:reset');
-        $doc[0].innerHTML = '<h1>Heading</h1><h2>Sub Heading</h2><h3>Sub-Sub Heading</h3><p>Paragraph Text</p>';
+        $doc[0].innerHTML = '<h1>Heading</h1><p>Paragraph Text</p><h2>Sub Heading</h2><p>Paragraph Text</p><h3>Sub-Sub Heading</h3><p>Paragraph Text</p><h2>Sub Heading</h2><p>Paragraph Text</p><ol><li>Item 1</li><ul><li>Sub Item 1</li><li>Sub Item 2</li></ul><li>Item 2</li></ol><p>Some formatting: <b>bold</b>, <i>italics</i>, <sub>subscript</sub>, <q>quote</q>, <a href="http://cnx.org">link</a>.<p>';
         return shared.changeHandler(null, null);
       };
       enable = function(evt, url) {
@@ -114,16 +114,16 @@
           });
           autoId = 0;
           shared.changeHandler = function(event, rangeObject) {
-            var $next, $orphan, $prev, context, html, id, node, op, orphan, parent, _i, _len, _ref, _results;
+            var $next, $orphan, $parent, $prev, context, html, id, node, op, orphan, _i, _len, _ref, _results;
             if (rangeObject) {
-              parent = $(rangeObject.startContainer).parents('*[id]').first();
-              if (parent.length && $doc[0] !== parent[0]) {
-                if (parent.parents($doc)) {
-                  node = parent.attr('id');
+              $parent = $(rangeObject.startContainer).parents('*[id]').first();
+              if ($parent.length && $doc[0] !== $parent[0]) {
+                if ($parent.parents().index($doc) >= 0) {
+                  node = $parent.attr('id');
                   socket.emit('node:select', [node]);
                   socket.emit('node:update', {
                     node: node,
-                    html: parent[0].innerHTML
+                    html: $parent[0].innerHTML
                   });
                 }
               }
@@ -138,10 +138,12 @@
               $orphan.attr('id', id);
               $prev = $orphan.prev('*[id]');
               if ($prev.length) {
-                socket.emit('node:update', {
-                  node: $prev.attr('id'),
-                  html: $prev[0].innerHTML
-                });
+                if ($prev.parents().index($doc) >= 0) {
+                  socket.emit('node:update', {
+                    node: $prev.attr('id'),
+                    html: $prev[0].innerHTML
+                  });
+                }
               }
               $next = $orphan.next('*[id]');
               if ($next.length) {

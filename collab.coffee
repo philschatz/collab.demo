@@ -12,7 +12,7 @@ Aloha.ready ->
 
     reset = () ->
       shared.socket.emit 'document:reset'
-      $doc[0].innerHTML = '<h1>Heading</h1><h2>Sub Heading</h2><h3>Sub-Sub Heading</h3><p>Paragraph Text</p>'
+      $doc[0].innerHTML = '<h1>Heading</h1><p>Paragraph Text</p><h2>Sub Heading</h2><p>Paragraph Text</p><h3>Sub-Sub Heading</h3><p>Paragraph Text</p><h2>Sub Heading</h2><p>Paragraph Text</p><ol><li>Item 1</li><ul><li>Sub Item 1</li><li>Sub Item 2</li></ul><li>Item 2</li></ol><p>Some formatting: <b>bold</b>, <i>italics</i>, <sub>subscript</sub>, <q>quote</q>, <a href="http://cnx.org">link</a>.<p>'
       shared.changeHandler(null, null)
 
     enable = (evt, url) ->
@@ -107,15 +107,15 @@ Aloha.ready ->
         # Lock a node when selection changes
         shared.changeHandler = (event, rangeObject) ->
           if rangeObject
-            parent = $(rangeObject.startContainer).parents('*[id]').first()
-            if parent.length && $doc[0] != parent[0]
+            $parent = $(rangeObject.startContainer).parents('*[id]').first()
+            if $parent.length && $doc[0] != $parent[0]
               # make sure the element is a descendant of the document
-              if parent.parents($doc)
-                node = parent.attr('id')
+              if $parent.parents().index($doc) >= 0
+                node = $parent.attr('id')
                 socket.emit 'node:select', [ node ]
               
                 # The selection also changes every time text is edited
-                socket.emit 'node:update', { node: node, html: parent[0].innerHTML }
+                socket.emit 'node:update', { node: node, html: $parent[0].innerHTML }
 
           # If anything doesn't have @id's treat them as appends
           # The user created a new element by pressing Enter
@@ -131,9 +131,10 @@ Aloha.ready ->
             # The user probably hit enter. so update the previous node
             $prev = $orphan.prev('*[id]')
             if $prev.length
-              socket.emit 'node:update',
-                node: $prev.attr 'id'
-                html: $prev[0].innerHTML
+              if $prev.parents().index($doc) >= 0
+                socket.emit 'node:update',
+                  node: $prev.attr 'id'
+                  html: $prev[0].innerHTML
   
             $next = $orphan.next('*[id]')
             if $next.length
