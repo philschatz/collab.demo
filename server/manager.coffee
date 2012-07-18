@@ -29,7 +29,7 @@ module.exports = (app) ->
 
   socketio = require('socket.io')
   io = socketio.listen(app)
-  COLORS = [ '#cc3333', '#3333cc', '#cccc33', '#cc33cc' ]
+  COLORS = [ '#cc3333', '#3333cc', '#33cc33', '#cccc33', '#cc33cc', '#33cccc' ]
   lastColor = 0
   locks = {}
   history = []
