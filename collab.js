@@ -122,7 +122,7 @@
           });
           autoId = 0;
           shared.changeHandler = function(event, rangeObject) {
-            var $next, $node, $orphan, $parent, $prev, context, html, id, key, node, op, orphan, _i, _len, _ref, _results;
+            var $next, $node, $orphan, $parent, $prev, context, html, id, key, node, op, orphan, orphans, _i, _len, _results;
             if (rangeObject) {
               $parent = $(rangeObject.startContainer).parents('*[id]').first();
               if ($parent.length && $doc[0] !== $parent[0]) {
@@ -149,10 +149,10 @@
               return this.nodeType === 3;
             }).wrap('<p></p>');
             $doc.find('br:not(.aloha-end-br)').remove();
-            _ref = $doc.children('*:not([id])');
+            orphans = $doc.children('*:not([id])').add($doc.find('p:not([id]),div:not([id])'));
             _results = [];
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              orphan = _ref[_i];
+            for (_i = 0, _len = orphans.length; _i < _len; _i++) {
+              orphan = orphans[_i];
               $orphan = $(orphan);
               id = "auto-" + me.user + "-id" + (++autoId);
               html = orphan.outerHTML;

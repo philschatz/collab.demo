@@ -145,7 +145,8 @@ Aloha.ready ->
           # The user created a new element by pressing Enter
           # Either it's a insertbefore or an append message
           # Find the new node
-          for orphan in $doc.children('*:not([id])')
+          orphans = $doc.children('*:not([id])').add($doc.find('p:not([id]),div:not([id])'))
+          for orphan in orphans
             $orphan = $(orphan)
   
             id = "auto-#{ me.user }-id#{ ++autoId }"
