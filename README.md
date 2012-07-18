@@ -15,5 +15,5 @@ Under the hood it uses http://aloha-editor.org
 
 Fork it and optionally compile the coffee files using http://coffeescript.org
 
-    coffee -c -w *.coffee toolbar/lib/*.coffee
+    coffee -c -w *.coffee toolbar/lib/*.coffee appmenu/*.coffee
 

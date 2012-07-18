@@ -26,7 +26,7 @@
         }
         shared.socket = socket = io.connect(url);
         return socket.on('connect', function() {
-          var autoId, debugReceive, me, onOperation, users;
+          var autoId, debugReceive, me, nodeMap, onOperation, users;
           debugReceive = function(command) {
             return socket.on(command, function(message) {
               if (command === 'node:operation') {
@@ -46,21 +46,25 @@
           debugReceive('node:update');
           $doc[0].innerHTML = '';
           resetBtn.setDisabled(false);
+          nodeMap = {};
           users = {};
           me = null;
           onOperation = function(msg) {
-            var $context, $el;
+            var $context, $el, $node;
             switch (msg.op) {
               case 'append':
                 $context = $doc;
                 if (msg.context) $context = $('#' + msg.context);
-                return $el = $(msg.html).attr('id', msg.node).appendTo($context);
+                $el = $(msg.html).attr('id', msg.node).appendTo($context);
+                return nodeMap[msg.node] = $el;
               case 'insertbefore':
                 $context = $('#' + msg.context);
-                return $el = $(msg.html).attr('id', msg.node).insertBefore($context);
+                $el = $(msg.html).attr('id', msg.node).insertBefore($context);
+                return nodeMap[msg.node] = $el;
               case 'delete':
-                $context = $('#' + msg.context);
-                return $context.remove();
+                $node = nodeMap[msg.node];
+                $node.remove();
+                return delete nodeMap[msg.node];
               default:
                 return console.log('Could not understand operation ', msg.op, msg);
             }
@@ -114,7 +118,7 @@
           });
           autoId = 0;
           shared.changeHandler = function(event, rangeObject) {
-            var $next, $orphan, $parent, $prev, context, html, id, node, op, orphan, _i, _len, _ref, _results;
+            var $next, $node, $orphan, $parent, $prev, context, html, id, key, node, op, orphan, _i, _len, _ref, _results;
             if (rangeObject) {
               $parent = $(rangeObject.startContainer).parents('*[id]').first();
               if ($parent.length && $doc[0] !== $parent[0]) {
@@ -126,6 +130,15 @@
                     html: $parent[0].innerHTML
                   });
                 }
+              }
+            }
+            for (key in nodeMap) {
+              $node = nodeMap[key];
+              if ($node.parents().index($doc) < 0) {
+                socket.emit('node:operation', {
+                  op: 'delete',
+                  node: key
+                });
               }
             }
             $doc.contents().filter(function() {
@@ -140,6 +153,7 @@
               id = "auto-" + me.user + "-id" + (++autoId);
               html = orphan.outerHTML;
               $orphan.attr('id', id);
+              nodeMap[id] = $orphan;
               $prev = $orphan.prev('*[id]');
               if ($prev.length) {
                 if ($prev.parents().index($doc) >= 0) {

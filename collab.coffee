@@ -39,6 +39,10 @@ Aloha.ready ->
     
         $doc[0].innerHTML = ''
         resetBtn.setDisabled false # Enable resetting of the document
+
+        # Keeps a mapping of all active nodes used in the document
+        # This allows us to tell when a node was deleted
+        nodeMap = {}
     
         users = {} # This will be populated by active users
         me = null
@@ -50,12 +54,15 @@ Aloha.ready ->
              $context = $doc
              $context = $('#' + msg.context) if msg.context
              $el = $(msg.html).attr('id', msg.node).appendTo($context)
+             nodeMap[msg.node] = $el
            when 'insertbefore'
              $context = $('#' + msg.context)
              $el = $(msg.html).attr('id', msg.node).insertBefore($context)
+             nodeMap[msg.node] = $el
            when 'delete'
-             $context = $('#' + msg.context)
-             $context.remove()
+             $node = nodeMap[msg.node]
+             $node.remove()
+             delete nodeMap[msg.node]
            else
               console.log 'Could not understand operation ', msg.op, msg
   
@@ -117,6 +124,14 @@ Aloha.ready ->
                 # The selection also changes every time text is edited
                 socket.emit 'node:update', { node: node, html: $parent[0].innerHTML }
 
+          # Check if any nodes were deleted
+          for key, $node of nodeMap
+            if $node.parents().index($doc) < 0
+              # The node was removed. notify!
+              socket.emit 'node:operation'
+                op: 'delete'
+                node: key
+                
           # If there is loose text (not in a para) wrap it in one
           $doc.contents().filter( () ->
             @nodeType == 3;
@@ -133,6 +148,7 @@ Aloha.ready ->
             id = "auto-#{ me.user }-id#{ ++autoId }"
             html = orphan.outerHTML
             $orphan.attr('id', id)
+            nodeMap[id] = $orphan
   
             # The user probably hit enter. so update the previous node
             $prev = $orphan.prev('*[id]')
