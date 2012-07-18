@@ -73,6 +73,40 @@ h2::before { content: counter(section) "." counter(sub-section); }
 }
 
 
+/* Figure numbering and styling */
+
+figure:first-child {
+  counter-reset: sub-figure;
+}
+/* HACK: resetting the counter on the figure and overriding
+   it in figure > figure does not work. The counter is still
+   reset so all subfigures are numbered the same ( as "a")
+*/
+figure:first-child {
+  counter-reset: sub-figure;
+}
+
+figure {
+  counter-increment: figure;
+  border: 1px solid #ccc;
+  margin: 1em;
+}
+figure > figcaption::before {
+  content: "Figure " counter(figure) " ";
+  font-weight: bold;
+}
+
+figure > figure {
+  counter-increment: sub-figure;
+  border: 1px solid #ccc;
+  margin: 1em;
+}
+figure > figure > figcaption::before {
+  content: "(" counter(sub-figure, lower-latin) ") ";
+  font-weight: bold;
+}
+
+
 /******************
     OER Tags
 ******************/
