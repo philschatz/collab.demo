@@ -128,6 +128,10 @@
                 }
               }
             }
+            $doc.contents().filter(function() {
+              return this.nodeType === 3;
+            }).wrap('<p></p>');
+            $doc.find('br').remove();
             _ref = $doc.children('*:not([id])');
             _results = [];
             for (_i = 0, _len = _ref.length; _i < _len; _i++) {

@@ -117,6 +117,12 @@ Aloha.ready ->
                 # The selection also changes every time text is edited
                 socket.emit 'node:update', { node: node, html: $parent[0].innerHTML }
 
+          # If there is loose text (not in a para) wrap it in one
+          $doc.contents().filter( () ->
+            @nodeType == 3;
+          ).wrap('<p></p>')
+          $doc.find('br').remove()
+          
           # If anything doesn't have @id's treat them as appends
           # The user created a new element by pressing Enter
           # Either it's a insertbefore or an append message
