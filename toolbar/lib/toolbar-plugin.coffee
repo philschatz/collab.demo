@@ -63,9 +63,16 @@ define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!fo
       FloatingMenu.addButton = FloatingMenu_addButton
       
       applyHeading = () ->
-        rangeObject = Aloha.Selection.rangeObject
+        rangeObject = Aloha.Selection.getRangeObject()
         GENTICS.Utils.Dom.extendToWord rangeObject  if rangeObject.isCollapsed()
+
         Aloha.Selection.changeMarkupOnSelection Aloha.jQuery(@markup)
+        # Attach the id and classes back onto the new element
+        $oldEl = $(rangeObject.getCommonAncestorContainer())
+        $newEl = $(Aloha.Selection.getRangeObject().getCommonAncestorContainer())
+        $newEl.addClass($oldEl.attr('class'))
+        # $newEl.attr('id', $oldEl.attr('id))
+        # Setting the id is commented because otherwise collaboration wouldn't register a change in the document
 
       
       order = [ 'p', 'h1', 'h2', 'h3' ]

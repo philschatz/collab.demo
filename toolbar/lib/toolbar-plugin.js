@@ -57,12 +57,15 @@
         var applyHeading, h, headingButtons, headingsButton, labels, order;
         FloatingMenu.addButton = FloatingMenu_addButton;
         applyHeading = function() {
-          var rangeObject;
-          rangeObject = Aloha.Selection.rangeObject;
+          var $newEl, $oldEl, rangeObject;
+          rangeObject = Aloha.Selection.getRangeObject();
           if (rangeObject.isCollapsed()) {
             GENTICS.Utils.Dom.extendToWord(rangeObject);
           }
-          return Aloha.Selection.changeMarkupOnSelection(Aloha.jQuery(this.markup));
+          Aloha.Selection.changeMarkupOnSelection(Aloha.jQuery(this.markup));
+          $oldEl = $(rangeObject.getCommonAncestorContainer());
+          $newEl = $(Aloha.Selection.getRangeObject().getCommonAncestorContainer());
+          return $newEl.addClass($oldEl.attr('class'));
         };
         order = ['p', 'h1', 'h2', 'h3'];
         labels = {
