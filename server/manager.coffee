@@ -77,7 +77,7 @@ module.exports = (app) ->
       
       # Can't just bind history to a new empty array because some functions have it stored in local vars
       while history.length
-        history.shift()
+        history.pop()
       for node of locks
         delete locks[node]
       
@@ -101,7 +101,14 @@ module.exports = (app) ->
       # TODO: Check that it's a valid operation
       operation.user = socket.id # Just for good measure/debugging?
       socket.broadcast.emit('node:operation', operation)
-      history.push { command: 'node:operation', message: operation }
+      switch operation.op
+        when 'delete'
+          for item, index in history
+            if item.message.node == operation.node
+              history.splice index, 1 # remove the append/insert
+              break
+        else
+          history.push { command: 'node:operation', message: operation }
 
     # Broadcast edits
     socket.on 'node:update', (msg) ->
