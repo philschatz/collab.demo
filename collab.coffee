@@ -60,8 +60,11 @@ Aloha.ready ->
              $el = $(msg.html).attr('id', msg.node).insertBefore($context)
              nodeMap[msg.node] = $el
            when 'delete'
-             $node = nodeMap[msg.node]
-             $node.remove()
+             if msg.node of nodeMap
+               $node = nodeMap[msg.node]
+               $node.remove()
+             else
+               console.warn 'BUG: Attempting to delete a node that does not exist'
              delete nodeMap[msg.node]
            else
               console.log 'Could not understand operation ', msg.op, msg

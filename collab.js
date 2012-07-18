@@ -62,8 +62,12 @@
                 $el = $(msg.html).attr('id', msg.node).insertBefore($context);
                 return nodeMap[msg.node] = $el;
               case 'delete':
-                $node = nodeMap[msg.node];
-                $node.remove();
+                if (msg.node in nodeMap) {
+                  $node = nodeMap[msg.node];
+                  $node.remove();
+                } else {
+                  console.warn('BUG: Attempting to delete a node that does not exist');
+                }
                 return delete nodeMap[msg.node];
               default:
                 return console.log('Could not understand operation ', msg.op, msg);
