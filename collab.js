@@ -144,7 +144,7 @@
             $doc.contents().filter(function() {
               return this.nodeType === 3;
             }).wrap('<p></p>');
-            $doc.find('br').remove();
+            $doc.find('br:not(.aloha-end-br)').remove();
             _ref = $doc.children('*:not([id])');
             _results = [];
             for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -182,7 +182,7 @@
             return _results;
           };
           Aloha.bind("aloha-selection-changed", shared.changeHandler);
-          return $doc.bind("focus", function(evt) {
+          $doc.bind('focus', function(evt) {
             return setTimeout((function() {
               var rangeObject, ranges, sel;
               sel = rangy.getSelection();
@@ -191,6 +191,9 @@
               rangeObject = ranges[0];
               return shared.changeHandler(evt, rangeObject);
             }), 10);
+          });
+          return $doc.bind('blur', function(evt) {
+            return socket.emit('node:select', []);
           });
         });
       };

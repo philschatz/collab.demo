@@ -136,7 +136,7 @@ Aloha.ready ->
           $doc.contents().filter( () ->
             @nodeType == 3;
           ).wrap('<p></p>')
-          $doc.find('br').remove()
+          $doc.find('br:not(.aloha-end-br)').remove()
           
           # If anything doesn't have @id's treat them as appends
           # The user created a new element by pressing Enter
@@ -179,13 +179,16 @@ Aloha.ready ->
   
         Aloha.bind "aloha-selection-changed", shared.changeHandler
         # On focus the cursor isn't available yet so fire the event after a period of time
-        $doc.bind "focus", (evt) ->
+        $doc.bind 'focus', (evt) ->
           setTimeout (() ->
             sel = rangy.getSelection()
             ranges = sel.getAllRanges()
             return  if ranges.length is 0
             rangeObject = ranges[0]
             shared.changeHandler evt, rangeObject), 10
+
+        $doc.bind 'blur', (evt) ->
+          socket.emit 'node:select', []
 
     resetBtn = new appmenu.MenuItem('Reset Document', {accel: 'Meta+Shift+E', action: reset, disabled: true})
 
