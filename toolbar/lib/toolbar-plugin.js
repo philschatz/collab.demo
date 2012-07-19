@@ -63,8 +63,8 @@
             GENTICS.Utils.Dom.extendToWord(rangeObject);
           }
           Aloha.Selection.changeMarkupOnSelection(Aloha.jQuery(this.markup));
-          $oldEl = $(rangeObject.getCommonAncestorContainer());
-          $newEl = $(Aloha.Selection.getRangeObject().getCommonAncestorContainer());
+          $oldEl = Aloha.jQuery(rangeObject.getCommonAncestorContainer());
+          $newEl = Aloha.jQuery(Aloha.Selection.getRangeObject().getCommonAncestorContainer());
           return $newEl.addClass($oldEl.attr('class'));
         };
         order = ['p', 'h1', 'h2', 'h3'];

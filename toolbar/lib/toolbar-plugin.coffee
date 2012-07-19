@@ -68,8 +68,8 @@ define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!fo
 
         Aloha.Selection.changeMarkupOnSelection Aloha.jQuery(@markup)
         # Attach the id and classes back onto the new element
-        $oldEl = $(rangeObject.getCommonAncestorContainer())
-        $newEl = $(Aloha.Selection.getRangeObject().getCommonAncestorContainer())
+        $oldEl = Aloha.jQuery(rangeObject.getCommonAncestorContainer())
+        $newEl = Aloha.jQuery(Aloha.Selection.getRangeObject().getCommonAncestorContainer())
         $newEl.addClass($oldEl.attr('class'))
         # $newEl.attr('id', $oldEl.attr('id))
         # Setting the id is commented because otherwise collaboration wouldn't register a change in the document
