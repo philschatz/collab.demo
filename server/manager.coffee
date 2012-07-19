@@ -32,17 +32,16 @@ module.exports = (app) ->
   COLORS = [ '#cc3333', '#3333cc', '#33cc33', '#cccc33', '#cc33cc', '#33cccc' ]
   lastColor = 0
   locks = {}
+  # Contains a list of appends that completely defines the document
   history = []
-  sessions = {}  
+  sessions = {}
   
   # Keep track of messages emitted so new clients can 'catch up'
   emitAll = (command, params) ->
-    console.log "Emit(all) #{ command }"
     io.sockets.emit command, params
 
   io.sockets.on 'connection', (socket) ->
     emit = (command, params) ->
-      console.log "Emit(one) #{ command }"
       socket.emit command, params
 
     color = COLORS[lastColor++ % COLORS.length]

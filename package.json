@@ -3,6 +3,7 @@
   "description": "Document collaboration engine",
   "version": "0.1.0",
   "homepage": "http://oerpub.github.com/oerpub.editor",
+  "node": "~0.8.0"
   "repository": {
     "type": "git",
     "url": "https://github.com/oerpub/oerpub.editor"
@@ -16,5 +17,11 @@
     "socket.io": "0.9.5"
   },
   "devDependencies": {
+  },
+  "engines": {
+    "node": "*"
+  },
+  "scripts": {
+    "start": "node server"
   }
 }
