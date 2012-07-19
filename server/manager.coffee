@@ -81,25 +81,30 @@ module.exports = (app) ->
         delete locks[node]
       
       socket.broadcast.emit 'document:reset'
-      emitAll('node:select', locks)
+      emitAll 'node:select', locks
 
     # When a user tries to lock something lock it
     socket.on 'node:select', (nodes) ->
+      changed = false
       # Remove all locks this user has
       for node, user of locks
-        if user == socket.id
+        if user == socket.id and node not in nodes
           delete locks[node]
+          changed = true
       
       for node in nodes
         if not locks[node]
           locks[node] = socket.id
-      emitAll('node:select', locks)
+          changed = true
+
+      if changed
+        emitAll 'node:select', locks
 
     # Handle document operations
     socket.on 'node:operation', (operation) ->
       # TODO: Check that it's a valid operation
       operation.user = socket.id # Just for good measure/debugging?
-      socket.broadcast.emit('node:operation', operation)
+      socket.broadcast.emit 'node:operation', operation
       switch operation.op
         when 'delete'
           for item, index in history
