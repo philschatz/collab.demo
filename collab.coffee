@@ -53,11 +53,18 @@ Aloha.ready ->
            when 'append'
              $context = $doc
              $context = $('#' + msg.context) if msg.context
-             $el = $(msg.html).attr('id', msg.node).appendTo($context)
+             console.warn 'message is missing an element name' if not msg.tag
+             $el = $("<#{ msg.tag } />").appendTo $context
+             $el.attr 'id', msg.node
+             for attrName, attrValue of msg.attrs
+               $el.attr attrName, attrValue
              nodeMap[msg.node] = $el
            when 'insertbefore'
              $context = $('#' + msg.context)
-             $el = $(msg.html).attr('id', msg.node).insertBefore($context)
+             $el = $("<#{ msg.tag } />").insertBefore $context
+             $el.attr 'id', msg.node
+             for attrName, attrValue of msg.attrs
+               $el.attr attrName, attrValue
              nodeMap[msg.node] = $el
            when 'delete'
              if msg.node of nodeMap
@@ -108,10 +115,19 @@ Aloha.ready ->
     
         socket.on 'node:update', (msg) ->
           setTimeout( () ->
-            n = $('#' + msg.node)
-            if n.length
-              n[0].innerHTML = msg.html
-          , 100)
+            $n = $('#' + msg.node)
+            if msg.tag and $n[0].tagName.toLowerCase() != msg.tag
+              $newNode = Aloha.jQuery("<#{ msg.tag } />")
+              $n.replaceWith $newNode
+              $n = $newNode
+              $n.attr 'id', msg.node
+            
+            if msg.attrs
+              for attrName, attrValue of msg.attrs
+                $n.attr attrName, attrValue
+            if $n.length
+              $n[0].innerHTML = msg.html
+          , 10)
     
         autoId = 0 # Incremented
         # Lock a node when selection changes
@@ -125,7 +141,15 @@ Aloha.ready ->
                 socket.emit 'node:select', [ node ]
               
                 # The selection also changes every time text is edited
-                socket.emit 'node:update', { node: node, html: $parent[0].innerHTML }
+                attribs = {}
+                for attr in $parent[0].attributes
+                  if attr.name != 'id'
+                    attribs[attr.name] = attr.value
+                socket.emit 'node:update',
+                  node: node
+                  tag: $parent[0].tagName.toLowerCase()
+                  attribs: attribs
+                  html: $parent[0].innerHTML
 
           # Check if any nodes were deleted
           for key, $node of nodeMap
@@ -150,7 +174,11 @@ Aloha.ready ->
             $orphan = $(orphan)
   
             id = "auto-#{ me.user }-id#{ ++autoId }"
-            html = orphan.outerHTML
+            html = orphan.innerHTML
+            attribs = {}
+            for attr in orphan.attributes
+              if attr.name != 'id'
+                attribs[attr.name] = attr.value
             $orphan.attr('id', id)
             nodeMap[id] = $orphan
   
@@ -158,8 +186,10 @@ Aloha.ready ->
             $prev = $orphan.prev('*[id]')
             if $prev.length
               if $prev.parents().index($doc) >= 0
+                # The selection also changes every time text is edited
                 socket.emit 'node:update',
                   node: $prev.attr 'id'
+                  tag: $prev[0].tagName.toLowerCase()
                   html: $prev[0].innerHTML
   
             $next = $orphan.next('*[id]')
@@ -178,6 +208,8 @@ Aloha.ready ->
               op: op
               node: id
               context: context
+              tag: orphan.tagName.toLowerCase()
+              attribs: attribs
               html: html
             socket.emit 'node:select', [ id ]
   
