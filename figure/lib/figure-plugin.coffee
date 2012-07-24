@@ -81,6 +81,9 @@ define [ "aloha", "aloha/plugin", "aloha/jquery", 'block/block', "block/blockman
           $element.find('img').attr('src', this.attr('image'))
           postProcessFn()
 
+        createEditablesIfNeeded: () ->
+          this.$element.find('figcaption').addClass('aloha-editable').contentEditable(true);
+
       BlockManager.registerBlockType('EditableImageBlock', EditableImageBlock)
 
 
