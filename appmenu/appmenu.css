@@ -9,7 +9,7 @@
   padding-right: 90px;
   box-shadow: 0 2px 3px 0 #ccc;
 }
-.tool-bar > .tool-button {
+.tool-bar > .menu-item {
   vertical-align: middle;
   display: inline-block;
   opacity: 0.70;
@@ -18,39 +18,39 @@
   padding: 5px;
   cursor: pointer;
 }
-.tool-bar > .tool-button.selected {
+.tool-bar > .menu-item.selected {
   opacity: 1.0;
   border: 1px solid #ccc;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 }
-.tool-bar > .tool-button.disabled.selected {
+.tool-bar > .menu-item.disabled.selected {
   border: 1px solid transparent;
 }
-.tool-bar > .tool-button.checked {
+.tool-bar > .menu-item.checked {
   background-color: #eee;
   opacity: 1.0;
   border: 1px solid #ccc;
 }
-.tool-bar > .tool-button > .checked-icon {
+.tool-bar > .menu-item > .checked-icon {
   display: none;
 }
-.tool-bar > .tool-button > .accel {
+.tool-bar > .menu-item > .accel {
   display: none;
 }
-.tool-bar > .tool-button > .tool-tip {
+.tool-bar > .menu-item > .tool-tip {
   display: none;
 }
-.tool-bar > .tool-button > .menu-icon {
+.tool-bar > .menu-item > .menu-icon {
   display: inline-block;
 }
-.tool-bar > .tool-button > .text {
+.tool-bar > .menu-item > .text {
   display: inline-block;
   font-weight: bold;
 }
-.tool-bar > .tool-button.icon > .text {
+.tool-bar > .menu-item.icon > .text {
   display: none;
 }
-.tool-bar > .tool-button > .submenu {
+.tool-bar > .menu-item > .submenu {
   display: inline-block;
   position: relative;
   padding-left: 3px;
@@ -75,6 +75,9 @@
 }
 .menu-item.disabled.selected {
   background-color: inherit;
+}
+.menu-item.checked.icon .checked-icon {
+  display: none;
 }
 .menu-item > .accel {
   position: absolute;
