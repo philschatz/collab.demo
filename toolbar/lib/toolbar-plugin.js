@@ -33,7 +33,7 @@
     }
   ];
 
-  toolbarSettings = ['bold', 'italic', 'underline', '', 'insertLink', 'insertImage', 'orderedList', 'unorderedList', 'outdentList', 'indentList', '', "alignLeft", "alignCenter", "alignRight", "alignJustify"];
+  toolbarSettings = ['bold', 'italic', 'underline', '', 'insertLink', 'insertImage', '', 'orderedList', 'unorderedList', 'outdentList', 'indentList', '', "alignLeft", "alignCenter", "alignRight", "alignJustify"];
 
   define(["aloha", "aloha/plugin", "ui/ui", 'ribbon/ribbon-plugin', "i18n!format/nls/i18n", "i18n!aloha/nls/i18n", "aloha/console", "css!toolbar/css/toolbar.css"], function(Aloha, Plugin, Ui, Ribbon, i18n, i18nCore) {
     var CONTAINER_JQUERY;
