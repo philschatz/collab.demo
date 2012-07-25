@@ -30,9 +30,6 @@ Aloha.settings.plugins = {
       'figure': {
         'aloha-block-type': 'EditableImageBlock'
       },
-      '.figure': {
-        'aloha-block-type': 'EditableImageBlock'
-      },
     }
   }
 }
@@ -40,28 +37,46 @@ Aloha.settings.plugins = {
 
 </script>
 
+
+  <script src="../Aloha-Editor/src/lib/vendor/jquery-1.7.2.js"></script>
+  <script src="../Aloha-Editor/src/lib/require.js"></script>
+
+  <script>Aloha.settings.jQuery = jQuery;</script>
+      
 <!-- The first plugins are required but the rest are included for playing around with -->
 	<script src="../Aloha-Editor/src/lib/aloha.js" data-aloha-plugins="
-
+common/ui,
             custom/toolbar,
             custom/figure,
             common/dom-to-xhtml,
-              common/format,
 
-              extra/cite,
-              extra/flag-icons,
-              extra/wai-lang,
-              common/table,
-              common/list,
-              common/link,
-              common/block,
-              common/undo,
-
-              common/paste,
-              common/commands,
-              common/image,
-              common/abbr,
-              extra/sourceview"></script>
+	                            common/format,
+	                            common/table,
+	                            common/list,
+	                            common/link,
+	                            common/highlighteditables,
+	                            common/undo,
+	                            common/contenthandler,
+	                            common/paste,
+	                            common/characterpicker,
+	                            common/commands,
+	                            common/block,
+	                            common/image,
+	                            common/abbr,
+	                            common/horizontalruler,
+	                            common/align,
+	                            extra/formatlesspaste,
+	                            extra/toc,
+	                            extra/headerids,
+	                            extra/listenforcer,
+	                            extra/metaview,
+	                            extra/ribbon,
+	                            extra/wai-lang,
+	                            extra/flag-icons,
+	                            extra/linkbrowser,
+	                            extra/imagebrowser,
+	                            extra/cite
+"></script>
 
 <!--               common/contenthandler, Warps figure tags into div tags -->
 
@@ -72,7 +87,6 @@ Aloha.settings.plugins = {
   <script src="./collab.js"></script>
 
   <!-- Provide a hotkey handler -->
-  <script>jQuery = Aloha.jQuery; // Set window.jQuery because hotkeys bind to it</script>
   <script src="lib/jquery.hotkeys.js"></script>
 
   <!-- These are the CSS/Javascript files that aren't written as Aloha Plugins -->
@@ -128,6 +142,7 @@ Aloha.ready(function() {
 <script>
 
 // Add in some menus. Make menubar global so collab can hook in some buttons
+/*
 window.menubar = new appmenu.MenuBar([
   new appmenu.MenuButton('File', new appmenu.Menu([
     new appmenu.MenuItem('New', {subMenu: new appmenu.Menu([
@@ -152,7 +167,7 @@ menubar.append(new appmenu.MenuButton('Edit', new appmenu.Menu([
   new appmenu.MenuItem('Disabled Item', {disabled: true, iconCls: 'aloha-button aloha-button-b'}),
   new appmenu.MenuItem('Checked Item', {checked: true}),
 ]) )); // End "Edit"
-
+*/
 
 // Make the document editable
 Aloha.ready(function() {
@@ -164,7 +179,7 @@ Aloha.ready(function() {
   }, 10000);
   
   // Render the menu
-  menubar.el.appendTo('.menubar');
+  //menubar.el.appendTo('.menubar');
   
 });
 </script>
