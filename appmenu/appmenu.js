@@ -46,7 +46,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
       var $el;
       if (cls == null) cls = '';
       if (markup == null) markup = '<div></div>';
-      $el = Aloha.jQuery(markup);
+      $el = $(markup);
       $el.addClass(cls);
       $el.bind('mousedown', function(evt) {
         evt.stopPropagation();
@@ -101,13 +101,13 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
     Menu.prototype.open = function(position) {
       var $canvas, that;
-      $canvas = Aloha.jQuery('body');
+      $canvas = $('body');
       position.top -= $canvas.scrollTop();
       position.left -= $canvas.scrollLeft();
       this.el.css(position).appendTo($canvas);
       this.el.show();
       that = this;
-      return Aloha.jQuery('body').one('mousedown', function() {
+      return $('body').one('mousedown', function() {
         return setTimeout(that.close.bind(that), 10);
       });
     };
@@ -144,10 +144,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
       this.subMenu = conf.subMenu || null;
       this.subMenuChar = conf.subMenuChar || '\u25B6';
       this.el = this._newDiv('menu-item');
-      if (this.iconCls != null) {
-        this.el.addClass('icon');
-        this._newDiv('menu-icon').addClass(this.iconCls).appendTo(this.el);
-      }
+      this.setIcon(this.iconCls);
       if (this.accel != null) {
         translated = this.accel.replace('Shift+', '⇧').replace('Meta+', '⌘');
         this._newDiv('accel').append(translated).appendTo(this.el);
@@ -165,17 +162,11 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
       }
       that = this;
       if (this.accel != null) {
-        Aloha.jQuery('body').bind('keydown', this.accel.toLowerCase(), function(evt) {
+        $('body').bind('keydown', this.accel.toLowerCase(), function(evt) {
           if (!that.isDisabled && that.action) return that.action(evt);
         });
       }
-      this.el.bind('click', function(evt) {
-        if (!that.disabled && that.action) {
-          evt.preventDefault();
-          Aloha.jQuery('.menu').hide();
-          return that.action(evt);
-        }
-      });
+      this.setAction(this.action);
       this.el.bind('mouseenter', function() {
         return that.el.addClass('selected');
       });
@@ -224,6 +215,35 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
     MenuItem.prototype._cssToggler = function(val, cls) {
       if (val) this.el.addClass(cls);
       if (!val) return this.el.removeClass(cls);
+    };
+
+    MenuItem.prototype.setIcon = function(iconCls) {
+      this.iconCls = iconCls;
+      if (this.iconCls != null) {
+        this.el.addClass('icon');
+        if (this.el.children('.menu-icon').length) {
+          return this.el.children('.menu-icon').addClass(this.iconCls);
+        } else {
+          return this._newDiv('menu-icon').addClass(this.iconCls).prependTo(this.el);
+        }
+      } else {
+        this.el.removeClass('icon');
+        return this.el.children('.menu-icon').remove();
+      }
+    };
+
+    MenuItem.prototype.setAction = function(action) {
+      var that;
+      this.action = action;
+      that = this;
+      this.el.off('click');
+      return this.el.bind('click', function(evt) {
+        if (!that.disabled && that.action) {
+          evt.preventDefault();
+          $('.menu').hide();
+          return that.action(evt);
+        }
+      });
     };
 
     MenuItem.prototype.setChecked = function(isChecked) {
@@ -355,12 +375,12 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
       });
       return this.el.bind('mouseenter', function(evt) {
         var openMenu, _i, _len, _ref, _results;
-        _ref = Aloha.jQuery('.menu');
+        _ref = $('.menu');
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           openMenu = _ref[_i];
           if (openMenu !== that.el[0]) {
-            _results.push(Aloha.jQuery(openMenu).hide());
+            _results.push($(openMenu).hide());
           } else {
             _results.push(void 0);
           }

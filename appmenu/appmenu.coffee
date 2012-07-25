@@ -37,7 +37,7 @@ MenuBase = class MenuBase
   
   # Helper function
   _newDiv: (cls='', markup='<div></div>') ->
-    $el = Aloha.jQuery(markup)
+    $el = $(markup)
     $el.addClass(cls)
     
     # Don't propagate the mousedown so we don't lose focus from the editable area
@@ -69,7 +69,7 @@ appmenu.Menu = class Menu extends MenuBase
 
   open: (position) ->
     # Since we're appending to 'body' we need to shift the menu by how much the body has scrolled
-    $canvas = Aloha.jQuery('body')
+    $canvas = $('body')
     position.top -= $canvas.scrollTop()
     position.left -= $canvas.scrollLeft()
     @el.css(position).appendTo($canvas)
@@ -77,7 +77,7 @@ appmenu.Menu = class Menu extends MenuBase
     # Close the menu when someone clicks outside the menu (locally mousedowns's are already squashed)
     # Add a handler for when someone clicks outside the menu
     that = @
-    Aloha.jQuery('body').one 'mousedown', () ->
+    $('body').one 'mousedown', () ->
       setTimeout(that.close.bind(that), 10)
   
   close: () ->
@@ -104,9 +104,7 @@ appmenu.MenuItem = class MenuItem extends MenuBase
     @el = @_newDiv('menu-item')
 
     # Add all the classes and child elements (ie icon, accelerator key)
-    if @iconCls?
-      @el.addClass('icon')
-      @_newDiv('menu-icon').addClass(@iconCls).appendTo(@el)
+    @setIcon(@iconCls)
     # @accel must go before @text otherwise shows up on next line
     if @accel?
       translated = @accel.replace('Shift+', '⇧').replace('Meta+', '⌘')
@@ -124,16 +122,11 @@ appmenu.MenuItem = class MenuItem extends MenuBase
     # Add some event handlers
     that = @
     if @accel?
-      Aloha.jQuery('body').bind 'keydown', @accel.toLowerCase(), (evt) ->
+      $('body').bind 'keydown', @accel.toLowerCase(), (evt) ->
         if not that.isDisabled and that.action
           that.action evt
 
-    @el.bind 'click', (evt) ->
-      if not that.disabled and that.action
-        evt.preventDefault()
-        # TODO: Hide all menus
-        Aloha.jQuery('.menu').hide()
-        that.action(evt)
+    @setAction(@action)
 
     # Add hover/selection
     @el.bind 'mouseenter', () ->
@@ -172,6 +165,27 @@ appmenu.MenuItem = class MenuItem extends MenuBase
   _cssToggler: (val, cls) ->
     @el.addClass(cls) if val
     @el.removeClass(cls) if not val
+
+  setIcon: (@iconCls) ->
+    if @iconCls?
+      @el.addClass('icon')
+      if @el.children('.menu-icon').length
+        @el.children('.menu-icon').addClass(@iconCls)
+      else
+        @_newDiv('menu-icon').addClass(@iconCls).prependTo(@el)
+    else
+      @el.removeClass('icon')
+      @el.children('.menu-icon').remove()
+
+  setAction: (@action) ->
+    that = @
+    @el.off 'click' # Unbind if an event was set
+    @el.bind 'click', (evt) ->
+      if not that.disabled and that.action
+        evt.preventDefault()
+        # TODO: Hide all menus
+        $('.menu').hide()
+        that.action(evt)
 
   setChecked: (@isChecked) ->
     @_cssToggler @isChecked, 'checked'
@@ -254,9 +268,9 @@ appmenu.MenuButton = class MenuButton extends MenuItem
 
     # On mouseover close all other menus (except submenu)
     @el.bind 'mouseenter', (evt) ->
-      for openMenu in Aloha.jQuery('.menu')
+      for openMenu in $('.menu')
         if openMenu != that.el[0]
-          Aloha.jQuery(openMenu).hide()
+          $(openMenu).hide()
 
 
 # ---- Custom MenuItems and Menus ---

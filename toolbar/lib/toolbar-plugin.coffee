@@ -1,66 +1,143 @@
-define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!format/nls/i18n", "i18n!aloha/nls/i18n", "aloha/console", "css!toolbar/css/toolbar.css" ], (Aloha, Plugin, jQuery, FloatingMenu, i18n, i18nCore) ->
+# including "ui/settings" has weird side effects, namely most of the buttons don't load
+menuSettings = [
+  text: "Format"
+  subMenu: [ "bold", "italic", "underline", "strikethrough", "subscript", "superscript", "quote", '', {text: 'Paragraph Styles', subMenu: ["indentList", "outdentList"] }, { text: "Align", subMenu: [ "alignLeft", "alignCenter", "alignRight", "alignJustify"] }, "formatLink", "formatAbbr", "formatNumeratedHeaders", "toggleMetaView", "wailang", "toggleFormatlessPaste" ]
+,
+  text: "Insert"
+  subMenu: [ "characterPicker", "insertLink", "insertImage", "insertAbbr", "insertToc", "insertHorizontalRule", "insertTag" ]
+,
+  text: "Table"
+  subMenu: [ "createTable", '', {text: "Cell", subMenu: ["mergecells", "splitcells", "tableCaption", "tableSummary", "formatTable"]}, { text: "Row", subMenu: ["addrowbefore", "addrowafter", "deleterows", "rowheader", "mergecellsRow", "splitcellsRow", "formatRow"]}, '', { text: "Column", subMenu: ["addcolumnleft", "addcolumnright", "deletecolumns", "columnheader", "mergecellsColumn", "splitcellsColumn", "formatColumn"] } ]
+]
+
+toolbarSettings = [
+ 'bold', 'italic', 'underline', '', 'insertLink', 'insertImage', 'orderedList', 'unorderedList', 'outdentList', 'indentList', '', "alignLeft", "alignCenter", "alignRight", "alignJustify"
+]
+
+define [ "aloha", "aloha/plugin", "ui/ui", 'ribbon/ribbon-plugin', "i18n!format/nls/i18n", "i18n!aloha/nls/i18n", "aloha/console", "css!toolbar/css/toolbar.css" ], (Aloha, Plugin, Ui, Ribbon, i18n, i18nCore) ->
 
   CONTAINER_JQUERY = jQuery('.toolbar') || jQuery('<div></div>').addClass('toolbar-container').appendTo('body')
-  enabledButtons =
-    'b': 'Ctrl+B'
-    'i': 'Ctrl+I'
-    's': 'Ctrl+Shift+S'
-    'sub': 'Ctrl+.'
-    'sup': 'Ctrl+,'
-    'quote': "Ctrl+\'"
-    'ul': 'Ctrl+Shift+7'
-    'ol': 'Ctrl+Shift+6'
-    'indent-list': 'Tab'
-    'outdent-list': 'Shift+Tab'
-    'insertLink': 'Ctrl+K'
-    'removeLink': 'Ctrl+Shift+K'
-
-  window.toolbar = toolbar = new appmenu.ToolBar()
-  toolbar.el.appendTo CONTAINER_JQUERY
   
-  FloatingMenu_addButton = (scope, button, tab, group) ->
-    # Note: button is an Aloha.ui.Button which wrapts an ExtJS button
-  
-    btn = new appmenu.ToolButton button.name, 
-      iconCls: button.iconClass
-      toolTip: button.name
-      accel: enabledButtons[button.name]
-      action: (evt) ->
-        evt.preventDefault() # Don't lose focus from the editor
-        # ExtJS hack. tableCreate uses this DOM element to create a dialog box
-        button.btnEl =
-          dom: @el[0]
-        
-        button.onclick(button, evt)
-
-    # Customize the setPressed (called when selection updates)
-    button.setPressed = (pressed) ->
-      if pressed
-        btn.setChecked true
-      else
-        btn.setChecked false
-    # Other operations defined by Aloha.ui.Button and used by the various plugins
-    button.disable = () ->
-      btn.setDisabled true
-    button.enable = () ->
-      btn.setDisabled false
-
-    # Disable all the buttons except the ones we want to support
-    # Aloha still calls functions on the Aloha.ui.Button and expects them to
-    # have been rendered somewhere so we override the functions and just not
-    # include the button so Aloha doesn't fail when trying to update the ExtButton
-    return  if not enabledButtons[button.name]
-
-    toolbar.append btn
-
   ###
    register the plugin with unique name
   ###
   Plugin.create "toolbar",
     init: ->
 
-      # Override the FloatingMenu.addButton
-      FloatingMenu.addButton = FloatingMenu_addButton
+      window.menubar = menubar = new appmenu.MenuBar []
+      menubar.el.appendTo $('.menubar')
+
+      window.toolbar = toolbar = new appmenu.ToolBar()
+      toolbar.el.appendTo CONTAINER_JQUERY
+      toolbar.el.addClass 'aloha'
+
+      menuLookup = {}
+      toolbarLookup = {}
+
+      recurse = (item, lookupMap) ->
+        if 'string' == $.type item
+          if '' == item
+            return new appmenu.Separator()
+          menuItem = new appmenu.MenuItem 'EMPTY_LABEL'
+          lookupMap[item] = menuItem
+          return menuItem
+        else
+          subItems = for subItem in item.subMenu or []
+            recurse subItem, lookupMap
+          subMenu = new appmenu.Menu subItems
+          subMenu.el.addClass 'aloha' # Hack to get the Aloha icons working
+          menuItem = new appmenu.MenuItem item.text,
+            subMenu: subMenu
+          return menuItem
+
+      
+      for tab in menuSettings
+        subMenuItems = for item in tab.subMenu
+          recurse item, menuLookup
+
+        menu = new appmenu.Menu subMenuItems
+        menu.el.addClass 'aloha' # Added so the CSS for aloha icons gets matched
+        
+        menubar.append(new appmenu.MenuButton tab.text, menu)
+
+      for item in toolbarSettings
+          toolbar.append (recurse item, toolbarLookup)
+
+        
+
+      # Hijack the toolbar buttons so we can customize where they are placed.
+      
+      Ui.adopt = (slot, type, settings) ->
+        if slot of menuLookup and slot of toolbarLookup
+          item = menuLookup[slot]
+          item2 = toolbarLookup[slot]
+
+          item.setText(settings.tooltip)
+          item.setIcon(settings.icon)
+          item.setAction(settings.click)
+
+          item2.setText(settings.tooltip)
+          item2.setIcon(settings.icon)
+          item2.setAction(settings.click)
+
+          return {
+            show: () ->
+              item.setHidden false
+              item2.setHidden false
+            hide: () ->
+              item.setHidden true
+              item2.setHidden true
+            setActive: (bool) ->
+              item.setChecked bool
+              item2.setChecked bool
+            setState: (bool) ->
+              item.setChecked(bool)
+              item2.setChecked(bool)
+            enable: () ->
+              item.setDisabled false
+              item2.setDisabled false
+            disable: () ->
+              item.setDisabled true
+              item2.setDisabled true
+            setActiveButton: (a, b) ->
+              console.log "#{slot} TODO:SETACTIVEBUTTON:", a, b
+            focus: (a) ->
+              console.log "#{slot} TODO:FOCUS:", a
+            foreground: (a) ->
+              console.log "#{slot} TODO:FOREGROUND:", a
+          }
+          
+        else if slot of menuLookup or slot of toolbarLookup
+          item = menuLookup[slot] or toolbarLookup[slot]
+        else
+          item = new appmenu.MenuItem 'DUMMY_ITEM_THAT_SQUASHES_STATE_CHANGES'
+                    
+        item.setText(settings.tooltip)
+        item.setIcon(settings.icon)
+        item.setAction(settings.click)
+
+        return {
+          show: () ->
+            item.setHidden false
+          hide: () ->
+            item.setHidden true
+          setActive: (bool) ->
+            item.setChecked bool
+          setState: (bool) ->
+            item.setChecked(bool)
+          setActiveButton: (a, b) ->
+            console.log "#{slot} SETACTIVEBUTTON:", a, b
+          enable: () ->
+            item.setDisabled false
+          disable: () ->
+            item.setDisabled true
+          focus: (a) ->
+            console.log "#{slot} TODO:FOCUS:", a
+          foreground: (a) ->
+            console.log "#{slot} TODO:FOREGROUND:", a
+        }
+        
+
       
       applyHeading = () ->
         rangeObject = Aloha.Selection.getRangeObject()
@@ -82,11 +159,13 @@ define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!fo
         'h2': 'Heading 2'
         'h3': 'Heading 3'
 
+      ###
       headingButtons = (new appmenu.custom.Heading("<#{ h } />", labels[h], {accel: "Ctrl+#{ h.charAt(1) }", action: applyHeading }) for h in order)
       
       headingsButton = new appmenu.ToolButton("Heading 1", {subMenu: new appmenu.Menu(headingButtons)})
       toolbar.append(headingsButton)
       toolbar.append(new appmenu.Separator())
+      ###
 
       # Keep track of the range because Aloha.Selection.obj seems to go {} sometimes
       Aloha.bind "aloha-selection-changed", (event, rangeObject) ->
@@ -94,10 +173,10 @@ define [ "aloha", "aloha/plugin", "aloha/jquery", "aloha/floatingmenu", "i18n!fo
         $el = Aloha.jQuery(rangeObject.startContainer)
         for h, i in order
           isActive = $el.parents(h).length > 0
-          headingButtons[i].setChecked(isActive)
+          #headingButtons[i].setChecked(isActive)
           # Update the toolbar to show the current heading level
-          if isActive
-            headingsButton.setText labels[h]
+          #if isActive
+          #  headingsButton.setText labels[h]
 
     ###
      toString method

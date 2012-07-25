@@ -1,6 +1,6 @@
 (function() {
 
-  define(["aloha", "aloha/plugin", "aloha/jquery", 'block/block', "block/blockmanager"], function(Aloha, Plugin, jQuery, block, BlockManager, i18n, i18nCore) {
+  define(["aloha", "aloha/plugin", 'block/block', "block/blockmanager"], function(Aloha, Plugin, block, BlockManager, i18n, i18nCore) {
     /*
        Monkey patch a couple of things in Aloha so figures can be draggable blocks
     */    block.AbstractBlock.prototype._postProcessElementIfNeeded = function() {

@@ -1,3 +1,6 @@
+/* Hide the toolbar */
+.aloha-ui-toolbar { display: none; }
+
 /******************
     Page styling
 ******************/

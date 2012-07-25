@@ -1,4 +1,4 @@
-define [ "aloha", "aloha/plugin", "aloha/jquery", 'block/block', "block/blockmanager" ], (Aloha, Plugin, jQuery, block, BlockManager, i18n, i18nCore) -> 
+define [ "aloha", "aloha/plugin", 'block/block', "block/blockmanager" ], (Aloha, Plugin, block, BlockManager, i18n, i18nCore) -> 
 
 
   ###
