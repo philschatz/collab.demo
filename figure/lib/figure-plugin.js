@@ -37,7 +37,7 @@
     */
     return Plugin.create("figure", {
       init: function() {
-        var EditableImageBlock;
+        var EditableImageBlock, editable, initializeBlocks, _i, _len, _ref;
         EditableImageBlock = block.AbstractBlock.extend({
           title: 'Image',
           getSchema: function() {
@@ -80,7 +80,20 @@
             return postProcessFn();
           }
         });
-        return BlockManager.registerBlockType('EditableImageBlock', EditableImageBlock);
+        BlockManager.registerBlockType('EditableImageBlock', EditableImageBlock);
+        initializeBlocks = function($editable) {
+          return $editable.find('figure:not(.aloha-block)').alohaBlock({
+            'aloha-block-type': 'EditableImageBlock'
+          }).find('figcaption').aloha();
+        };
+        _ref = Aloha.editables;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          editable = _ref[_i];
+          initializeBlocks(editable.obj);
+        }
+        return Aloha.bind('aloha-editable-created', function($event, editable) {
+          return initializeBlocks(editable.obj);
+        });
       },
       /*
            toString method

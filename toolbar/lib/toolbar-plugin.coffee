@@ -71,6 +71,8 @@ define [ "aloha", "aloha/plugin", "ui/ui", 'ribbon/ribbon-plugin', "i18n!format/
         if slot of menuLookup and slot of toolbarLookup
           item = menuLookup[slot]
           item2 = toolbarLookup[slot]
+          item.element = item.el # CreateTable and some others do onclick () -> this.element
+          item2.element = item2.el # CreateTable and some others do onclick () -> this.element
 
           item.setText(settings.tooltip)
           item.setIcon(settings.icon)
@@ -115,6 +117,7 @@ define [ "aloha", "aloha/plugin", "ui/ui", 'ribbon/ribbon-plugin', "i18n!format/
         item.setText(settings.tooltip)
         item.setIcon(settings.icon)
         item.setAction(settings.click)
+        item.element = item.el # CreateTable and some others do onclick () -> this.element
 
         return {
           show: () ->

@@ -102,6 +102,8 @@
           if (slot in menuLookup && slot in toolbarLookup) {
             item = menuLookup[slot];
             item2 = toolbarLookup[slot];
+            item.element = item.el;
+            item2.element = item2.el;
             item.setText(settings.tooltip);
             item.setIcon(settings.icon);
             item.setAction(settings.click);
@@ -151,6 +153,7 @@
           item.setText(settings.tooltip);
           item.setIcon(settings.icon);
           item.setAction(settings.click);
+          item.element = item.el;
           return {
             show: function() {
               return item.setHidden(false);
