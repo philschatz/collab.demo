@@ -228,7 +228,7 @@ Aloha.ready ->
 
     resetBtn = new appmenu.MenuItem('Reset Document', {accel: 'Meta+Shift+E', action: reset, disabled: true})
 
-    window.menubar.append(new appmenu.MenuButton('Collaborate!', new appmenu.Menu([
+    window.menubar.append(new appmenu.MenuButton('Cool Stuff!', new appmenu.Menu([
       new appmenu.MenuItem('Enable!', {accel: 'Meta+E', action: (evt) -> enable evt, 'http://boole.cnx.rice.edu:3001'})
       resetBtn
       new appmenu.Separator()

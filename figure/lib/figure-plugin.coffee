@@ -83,6 +83,17 @@ define [ "aloha", "aloha/plugin", 'block/block', "block/blockmanager" ], (Aloha,
 
       BlockManager.registerBlockType('EditableImageBlock', EditableImageBlock)
 
+      initializeBlocks = ($editable) ->
+        $editable.find('figure:not(.aloha-block)').alohaBlock({'aloha-block-type': 'EditableImageBlock'}).find('figcaption').aloha()
+
+      for editable in Aloha.editables
+        initializeBlocks editable.obj
+
+      Aloha.bind 'aloha-editable-created', ($event, editable) ->
+        initializeBlocks editable.obj
+
+      #Aloha.bind 'aloha-editable-destroyed', ($event, editable) ->
+      #  block.$element
 
     ###
      toString method
