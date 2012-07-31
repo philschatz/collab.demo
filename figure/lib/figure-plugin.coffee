@@ -48,35 +48,20 @@ define [ "aloha", "aloha/plugin", 'block/block', "block/blockmanager", 'ui/ui' ]
   Plugin.create "figure",
     init: ->
 
-      Ui.adopt 'insertFigure', null,
+      Ui.adopt 'insertFigure', {isInstance:()-> false},
         tooltip: 'Create Figure'
         click: (evt) ->
           console.log 'sdkjfh'
-          markup = jQuery('<figure><span class="media"> </span><figcaption>Enter Caption Here</figcaption></figure>')
+          markup = jQuery("<figure><span class='media'><img src='#{Aloha.getPluginUrl('image')}/img/blank.jpg'/></span><figcaption>Enter Caption Here</figcaption></figure>")
           rangeObject = Aloha.Selection.getRangeObject()
           GENTICS.Utils.Dom.insertIntoDOM(markup, rangeObject, jQuery(Aloha.activeEditable.obj))
           markup.alohaBlock({'aloha-block-type': 'FigureBlock'})
 
       FigureBlock = block.AbstractBlock.extend
         title: 'Image'
-        getSchema: () ->
-          'image':
-            type: 'string'
-            label: 'Image URI'
-          'position':
-            type: 'select'
-            label: 'Position'
-            values: [{
-              key: ''
-              label: 'No Float'
-            }, {
-              key: 'left'
-              label: 'Float left'
-            }, {
-              key: 'right'
-              label: 'Float right'
-            }]
         init: ($element, postProcessFn) ->
+          # By default blocks are not editable
+          $element.contentEditable(true)
           this.attr('image', $element.find('img').attr('src'))
           postProcessFn()
         update: ($element, postProcessFn) ->
@@ -89,11 +74,34 @@ define [ "aloha", "aloha/plugin", 'block/block', "block/blockmanager", 'ui/ui' ]
     
           $element.find('img').attr('src', this.attr('image'))
           postProcessFn()
+        _onElementClickHandler: () ->
+          console.log 'Ignoring figure click'
+        
+        _preventSelectionChangedEventHandler: (evt) ->
+          console.log 'Ignoring figure mousedown/focus/something'
 
       BlockManager.registerBlockType('FigureBlock', FigureBlock)
 
       initializeBlocks = ($editable) ->
-        # $editable.find('figure:not(.aloha-block)').alohaBlock({'aloha-block-type': 'FigureBlock'}).find('figcaption').aloha()
+        figures = $editable.find('figure:not(.aloha-block)').alohaBlock({'aloha-block-type': 'FigureBlock'})
+        #figures.find('figcaption').aloha()
+        # register drop handlers to store the dropped file as a data URI
+        figures.find('img').on 'drop', (dropEvent) ->
+          img = jQuery(dropEvent.target)
+          dropEvent.preventDefault()
+          
+          readFile = (file) ->
+            if file?
+              [majorType, minorType] = file.type.split("/")
+              reader = new FileReader()
+              if majorType == "image"
+                reader.onload = (loadEvent) ->
+                  img.attr 'src', loadEvent.target.result
+                reader.readAsDataURL(file)
+
+          if (dt = dropEvent.originalEvent.dataTransfer)?
+            if 'Files' in dt.types
+              readFile dt.files[0]
 
       for editable in Aloha.editables
         initializeBlocks editable.obj
