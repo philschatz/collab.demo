@@ -4,14 +4,14 @@ menuSettings = [
   subMenu: [ "bold", "italic", "underline", "strikethrough", "subscript", "superscript", "quote", '', {text: 'Paragraph Styles', subMenu: ["indentList", "outdentList"] }, { text: "Align", subMenu: [ "alignLeft", "alignCenter", "alignRight", "alignJustify"] }, "formatLink", "formatAbbr", "formatNumeratedHeaders", "toggleMetaView", "wailang", "toggleFormatlessPaste" ]
 ,
   text: "Insert"
-  subMenu: [ "characterPicker", "insertLink", "insertImage", "insertAbbr", "insertToc", "insertHorizontalRule", "insertTag" ]
+  subMenu: [ "characterPicker", "insertLink", "insertImage", 'insertFigure', "insertAbbr", "insertToc", "insertHorizontalRule", "insertTag" ]
 ,
   text: "Table"
   subMenu: [ "createTable", '', {text: "Cell", subMenu: ["mergecells", "splitcells", "tableCaption", "tableSummary", "formatTable"]}, { text: "Row", subMenu: ["addrowbefore", "addrowafter", "deleterows", "rowheader", "mergecellsRow", "splitcellsRow", "formatRow"]}, '', { text: "Column", subMenu: ["addcolumnleft", "addcolumnright", "deletecolumns", "columnheader", "mergecellsColumn", "splitcellsColumn", "formatColumn"] } ]
 ]
 
 toolbarSettings = [
- 'bold', 'italic', 'underline', '', 'insertLink', 'insertImage', '', 'orderedList', 'unorderedList', 'outdentList', 'indentList', '', "alignLeft", "alignCenter", "alignRight", "alignJustify"
+ 'bold', 'italic', 'underline', '', 'insertLink', 'insertImage', 'insertFigure', '', 'orderedList', 'unorderedList', 'outdentList', 'indentList', '', "alignLeft", "alignCenter", "alignRight", "alignJustify"
 ]
 
 define [ "aloha", "aloha/plugin", "ui/ui", 'ribbon/ribbon-plugin', "i18n!format/nls/i18n", "i18n!aloha/nls/i18n", "aloha/console", "css!toolbar/css/toolbar.css" ], (Aloha, Plugin, Ui, Ribbon, i18n, i18nCore) ->

@@ -1,6 +1,6 @@
 (function() {
 
-  define(["aloha", "aloha/plugin", 'block/block', "block/blockmanager"], function(Aloha, Plugin, block, BlockManager, i18n, i18nCore) {
+  define(["aloha", "aloha/plugin", 'block/block', "block/blockmanager", 'ui/ui'], function(Aloha, Plugin, block, BlockManager, Ui, i18n, i18nCore) {
     /*
        Monkey patch a couple of things in Aloha so figures can be draggable blocks
     */    block.AbstractBlock.prototype._postProcessElementIfNeeded = function() {
@@ -37,8 +37,21 @@
     */
     return Plugin.create("figure", {
       init: function() {
-        var EditableImageBlock, editable, initializeBlocks, _i, _len, _ref;
-        EditableImageBlock = block.AbstractBlock.extend({
+        var FigureBlock, editable, initializeBlocks, _i, _len, _ref;
+        Ui.adopt('insertFigure', null, {
+          tooltip: 'Create Figure',
+          click: function(evt) {
+            var markup, rangeObject;
+            console.log('sdkjfh');
+            markup = jQuery('<figure><span class="media"> </span><figcaption>Enter Caption Here</figcaption></figure>');
+            rangeObject = Aloha.Selection.getRangeObject();
+            GENTICS.Utils.Dom.insertIntoDOM(markup, rangeObject, jQuery(Aloha.activeEditable.obj));
+            return markup.alohaBlock({
+              'aloha-block-type': 'FigureBlock'
+            });
+          }
+        });
+        FigureBlock = block.AbstractBlock.extend({
           title: 'Image',
           getSchema: function() {
             return {
@@ -80,12 +93,8 @@
             return postProcessFn();
           }
         });
-        BlockManager.registerBlockType('EditableImageBlock', EditableImageBlock);
-        initializeBlocks = function($editable) {
-          return $editable.find('figure:not(.aloha-block)').alohaBlock({
-            'aloha-block-type': 'EditableImageBlock'
-          }).find('figcaption').aloha();
-        };
+        BlockManager.registerBlockType('FigureBlock', FigureBlock);
+        initializeBlocks = function($editable) {};
         _ref = Aloha.editables;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           editable = _ref[_i];

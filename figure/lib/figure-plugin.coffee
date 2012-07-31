@@ -1,4 +1,4 @@
-define [ "aloha", "aloha/plugin", 'block/block', "block/blockmanager" ], (Aloha, Plugin, block, BlockManager, i18n, i18nCore) -> 
+define [ "aloha", "aloha/plugin", 'block/block', "block/blockmanager", 'ui/ui' ], (Aloha, Plugin, block, BlockManager, Ui, i18n, i18nCore) -> 
 
 
   ###
@@ -48,7 +48,16 @@ define [ "aloha", "aloha/plugin", 'block/block', "block/blockmanager" ], (Aloha,
   Plugin.create "figure",
     init: ->
 
-      EditableImageBlock = block.AbstractBlock.extend
+      Ui.adopt 'insertFigure', null,
+        tooltip: 'Create Figure'
+        click: (evt) ->
+          console.log 'sdkjfh'
+          markup = jQuery('<figure><span class="media"> </span><figcaption>Enter Caption Here</figcaption></figure>')
+          rangeObject = Aloha.Selection.getRangeObject()
+          GENTICS.Utils.Dom.insertIntoDOM(markup, rangeObject, jQuery(Aloha.activeEditable.obj))
+          markup.alohaBlock({'aloha-block-type': 'FigureBlock'})
+
+      FigureBlock = block.AbstractBlock.extend
         title: 'Image'
         getSchema: () ->
           'image':
@@ -81,10 +90,10 @@ define [ "aloha", "aloha/plugin", 'block/block', "block/blockmanager" ], (Aloha,
           $element.find('img').attr('src', this.attr('image'))
           postProcessFn()
 
-      BlockManager.registerBlockType('EditableImageBlock', EditableImageBlock)
+      BlockManager.registerBlockType('FigureBlock', FigureBlock)
 
       initializeBlocks = ($editable) ->
-        $editable.find('figure:not(.aloha-block)').alohaBlock({'aloha-block-type': 'EditableImageBlock'}).find('figcaption').aloha()
+        # $editable.find('figure:not(.aloha-block)').alohaBlock({'aloha-block-type': 'FigureBlock'}).find('figcaption').aloha()
 
       for editable in Aloha.editables
         initializeBlocks editable.obj
