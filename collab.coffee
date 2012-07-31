@@ -170,6 +170,7 @@ Aloha.ready ->
           # Either it's a insertbefore or an append message
           # Find the new node
           orphans = $doc.children('*:not([id])').add($doc.find('p:not([id]),div:not([id])'))
+          # TODO: Handle tables and blocks that are created (Aloha gives them id's)
           for orphan in orphans
             $orphan = $(orphan)
   
