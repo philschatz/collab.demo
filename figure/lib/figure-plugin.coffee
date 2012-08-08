@@ -56,6 +56,7 @@ define [ "aloha", "aloha/plugin", 'block/block', "block/blockmanager", 'ui/ui' ]
           rangeObject = Aloha.Selection.getRangeObject()
           GENTICS.Utils.Dom.insertIntoDOM(markup, rangeObject, jQuery(Aloha.activeEditable.obj))
           markup.alohaBlock({'aloha-block-type': 'FigureBlock'})
+          initializeFigures markup
 
       FigureBlock = block.AbstractBlock.extend
         title: 'Image'
@@ -79,14 +80,16 @@ define [ "aloha", "aloha/plugin", 'block/block', "block/blockmanager", 'ui/ui' ]
         
         _preventSelectionChangedEventHandler: (evt) ->
           console.log 'Ignoring figure mousedown/focus/something'
+          window.setTimeout (() -> jQuery(this).trigger( 'focus' )), 1
+
 
       BlockManager.registerBlockType('FigureBlock', FigureBlock)
 
-      initializeBlocks = ($editable) ->
-        figures = $editable.find('figure:not(.aloha-block)').alohaBlock({'aloha-block-type': 'FigureBlock'})
-        #figures.find('figcaption').aloha()
+      initializeFigures = ($figures) ->
+        # $figures.find('figcaption').aloha()
+
         # register drop handlers to store the dropped file as a data URI
-        figures.find('img').on 'drop', (dropEvent) ->
+        $figures.find('img').on 'drop', (dropEvent) ->
           img = jQuery(dropEvent.target)
           dropEvent.preventDefault()
           
@@ -103,11 +106,14 @@ define [ "aloha", "aloha/plugin", 'block/block', "block/blockmanager", 'ui/ui' ]
             if 'Files' in dt.types
               readFile dt.files[0]
 
+      initializeEditable = ($editable) ->
+        initializeFigures $editable.find('figure:not(.aloha-block)').alohaBlock({'aloha-block-type': 'FigureBlock'})
+
       for editable in Aloha.editables
-        initializeBlocks editable.obj
+        initializeEditable editable.obj
 
       Aloha.bind 'aloha-editable-created', ($event, editable) ->
-        initializeBlocks editable.obj
+        initializeEditable editable.obj
 
       #Aloha.bind 'aloha-editable-destroyed', ($event, editable) ->
       #  block.$element
