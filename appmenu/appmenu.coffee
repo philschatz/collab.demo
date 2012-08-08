@@ -30,9 +30,9 @@ ToolBar > Menu = [ ToolButton ]
 ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
 ###
-window.appmenu = appmenu = {}
+appmenu = {}
 
-MenuBase = class MenuBase
+class appmenu.MenuBase
   constructor: () ->
   
   # Helper function
@@ -48,7 +48,7 @@ MenuBase = class MenuBase
     $el
 
 
-appmenu.Menu = class Menu extends MenuBase
+class appmenu.Menu extends appmenu.MenuBase
   constructor: (@items=[]) ->
     @el = @_newDiv('menu')
 
@@ -87,7 +87,7 @@ appmenu.Menu = class Menu extends MenuBase
         item.subMenu.close()
     @el.hide()
 
-appmenu.MenuItem = class MenuItem extends MenuBase
+class appmenu.MenuItem extends appmenu.MenuBase
   constructor: (@text, conf = {}) ->
     super 'menu-item'
     @action = conf.action || null
@@ -203,7 +203,7 @@ appmenu.MenuItem = class MenuItem extends MenuBase
   setText: (@text) ->
     @el.children('.text')[0].innerHTML = @text
 
-appmenu.Separator = class Separator extends MenuItem
+class appmenu.Separator extends appmenu.MenuItem
   constructor: () ->
     super(null, { disabled: true })
     @el.addClass 'separator'
@@ -212,7 +212,7 @@ appmenu.Separator = class Separator extends MenuItem
 
 # ---- Specific to ToolBar ---
 
-appmenu.ToolBar = class ToolBar extends Menu
+class appmenu.ToolBar extends appmenu.Menu
   constructor: (items=[]) ->
     super items
     @el.addClass 'tool-bar' # Don't add it to 'menu'
@@ -221,7 +221,7 @@ appmenu.ToolBar = class ToolBar extends Menu
   close: () ->
     # Never close a toolbar
 
-appmenu.ToolButton = class ToolButton extends MenuItem
+class appmenu.ToolButton extends appmenu.MenuItem
   constructor: (text, conf) ->
     # By default it's a right arrow, but the toolbar buttons use a down arrow
     conf.subMenuChar = '\u25BC'
@@ -245,7 +245,7 @@ appmenu.ToolButton = class ToolButton extends MenuItem
 
 # ---- Specific to MenuBar ---
 
-appmenu.MenuBar = class MenuBar extends Menu
+class appmenu.MenuBar extends appmenu.Menu
   constructor: (items) ->
     super(items)
     @el.addClass 'menu-bar'
@@ -255,7 +255,7 @@ appmenu.MenuBar = class MenuBar extends Menu
     # Cannot be closed
   
 
-appmenu.MenuButton = class MenuButton extends MenuItem
+class appmenu.MenuButton extends appmenu.MenuItem
   constructor: (text, subMenu) ->
     super(text, { subMenu: subMenu })
     @el.addClass 'menu-button'
@@ -275,7 +275,7 @@ appmenu.MenuButton = class MenuButton extends MenuItem
 
 # ---- Custom MenuItems and Menus ---
 appmenu.custom = {}
-class appmenu.custom.Heading extends MenuItem
+class appmenu.custom.Heading extends appmenu.MenuItem
   constructor: (@markup, text, conf) ->
     super(text, conf)
   
@@ -287,3 +287,8 @@ class appmenu.custom.Heading extends MenuItem
       $el
     else
       super(cls)
+
+if module?
+  module.exports = appmenu
+if window?
+  window.appmenu = appmenu

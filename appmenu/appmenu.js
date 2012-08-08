@@ -32,13 +32,13 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 */
 
 (function() {
-  var Menu, MenuBar, MenuBase, MenuButton, MenuItem, Separator, ToolBar, ToolButton, appmenu,
+  var appmenu,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
-  window.appmenu = appmenu = {};
+  appmenu = {};
 
-  MenuBase = MenuBase = (function() {
+  appmenu.MenuBase = (function() {
 
     function MenuBase() {}
 
@@ -59,7 +59,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
   })();
 
-  appmenu.Menu = Menu = (function(_super) {
+  appmenu.Menu = (function(_super) {
 
     __extends(Menu, _super);
 
@@ -124,9 +124,9 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
     return Menu;
 
-  })(MenuBase);
+  })(appmenu.MenuBase);
 
-  appmenu.MenuItem = MenuItem = (function(_super) {
+  appmenu.MenuItem = (function(_super) {
 
     __extends(MenuItem, _super);
 
@@ -272,9 +272,9 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
     return MenuItem;
 
-  })(MenuBase);
+  })(appmenu.MenuBase);
 
-  appmenu.Separator = Separator = (function(_super) {
+  appmenu.Separator = (function(_super) {
 
     __extends(Separator, _super);
 
@@ -289,9 +289,9 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
     return Separator;
 
-  })(MenuItem);
+  })(appmenu.MenuItem);
 
-  appmenu.ToolBar = ToolBar = (function(_super) {
+  appmenu.ToolBar = (function(_super) {
 
     __extends(ToolBar, _super);
 
@@ -306,9 +306,9 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
     return ToolBar;
 
-  })(Menu);
+  })(appmenu.Menu);
 
-  appmenu.ToolButton = ToolButton = (function(_super) {
+  appmenu.ToolButton = (function(_super) {
 
     __extends(ToolButton, _super);
 
@@ -338,9 +338,9 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
     return ToolButton;
 
-  })(MenuItem);
+  })(appmenu.MenuItem);
 
-  appmenu.MenuBar = MenuBar = (function(_super) {
+  appmenu.MenuBar = (function(_super) {
 
     __extends(MenuBar, _super);
 
@@ -354,9 +354,9 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
     return MenuBar;
 
-  })(Menu);
+  })(appmenu.Menu);
 
-  appmenu.MenuButton = MenuButton = (function(_super) {
+  appmenu.MenuButton = (function(_super) {
 
     __extends(MenuButton, _super);
 
@@ -391,7 +391,7 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
     return MenuButton;
 
-  })(MenuItem);
+  })(appmenu.MenuItem);
 
   appmenu.custom = {};
 
@@ -417,6 +417,10 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
     return Heading;
 
-  })(MenuItem);
+  })(appmenu.MenuItem);
+
+  if (typeof module !== "undefined" && module !== null) module.exports = appmenu;
+
+  if (typeof window !== "undefined" && window !== null) window.appmenu = appmenu;
 
 }).call(this);
