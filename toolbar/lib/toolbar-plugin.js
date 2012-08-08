@@ -98,7 +98,88 @@
           toolbar.append(recurse(item, toolbarLookup));
         }
         Ui.adopt = function(slot, type, settings) {
-          var item2;
+          var ItemRelay, item2;
+          ItemRelay = (function() {
+
+            function ItemRelay(items) {
+              this.items = items;
+            }
+
+            ItemRelay.prototype.show = function() {
+              var item, _k, _len3, _ref, _results;
+              _ref = this.items;
+              _results = [];
+              for (_k = 0, _len3 = _ref.length; _k < _len3; _k++) {
+                item = _ref[_k];
+                _results.push(item.setHidden(false));
+              }
+              return _results;
+            };
+
+            ItemRelay.prototype.hide = function() {
+              var item, _k, _len3, _ref, _results;
+              _ref = this.items;
+              _results = [];
+              for (_k = 0, _len3 = _ref.length; _k < _len3; _k++) {
+                item = _ref[_k];
+                _results.push(item.setHidden(true));
+              }
+              return _results;
+            };
+
+            ItemRelay.prototype.setActive = function(bool) {
+              var item, _k, _len3, _ref, _results;
+              _ref = this.items;
+              _results = [];
+              for (_k = 0, _len3 = _ref.length; _k < _len3; _k++) {
+                item = _ref[_k];
+                _results.push(item.setChecked(bool));
+              }
+              return _results;
+            };
+
+            ItemRelay.prototype.setState = function(bool) {
+              return this.setActive(bool);
+            };
+
+            ItemRelay.prototype.enable = function(bool) {
+              var item, _k, _len3, _ref, _results;
+              if (bool == null) bool = true;
+              _ref = this.items;
+              _results = [];
+              for (_k = 0, _len3 = _ref.length; _k < _len3; _k++) {
+                item = _ref[_k];
+                _results.push(item.setDisabled(!bool));
+              }
+              return _results;
+            };
+
+            ItemRelay.prototype.disable = function() {
+              var item, _k, _len3, _ref, _results;
+              _ref = this.items;
+              _results = [];
+              for (_k = 0, _len3 = _ref.length; _k < _len3; _k++) {
+                item = _ref[_k];
+                _results.push(item.setDisabled(true));
+              }
+              return _results;
+            };
+
+            ItemRelay.prototype.setActiveButton = function(a, b) {
+              return console.log("" + slot + " TODO:SETACTIVEBUTTON:", a, b);
+            };
+
+            ItemRelay.prototype.focus = function(a) {
+              return console.log("" + slot + " TODO:FOCUS:", a);
+            };
+
+            ItemRelay.prototype.foreground = function(a) {
+              return console.log("" + slot + " TODO:FOREGROUND:", a);
+            };
+
+            return ItemRelay;
+
+          })();
           if (slot in menuLookup && slot in toolbarLookup) {
             item = menuLookup[slot];
             item2 = toolbarLookup[slot];
@@ -110,41 +191,7 @@
             item2.setText(settings.tooltip);
             item2.setIcon(settings.icon);
             item2.setAction(settings.click);
-            return {
-              show: function() {
-                item.setHidden(false);
-                return item2.setHidden(false);
-              },
-              hide: function() {
-                item.setHidden(true);
-                return item2.setHidden(true);
-              },
-              setActive: function(bool) {
-                item.setChecked(bool);
-                return item2.setChecked(bool);
-              },
-              setState: function(bool) {
-                item.setChecked(bool);
-                return item2.setChecked(bool);
-              },
-              enable: function() {
-                item.setDisabled(false);
-                return item2.setDisabled(false);
-              },
-              disable: function() {
-                item.setDisabled(true);
-                return item2.setDisabled(true);
-              },
-              setActiveButton: function(a, b) {
-                return console.log("" + slot + " TODO:SETACTIVEBUTTON:", a, b);
-              },
-              focus: function(a) {
-                return console.log("" + slot + " TODO:FOCUS:", a);
-              },
-              foreground: function(a) {
-                return console.log("" + slot + " TODO:FOREGROUND:", a);
-              }
-            };
+            return new ItemRelay([item, item2]);
           } else if (slot in menuLookup || slot in toolbarLookup) {
             item = menuLookup[slot] || toolbarLookup[slot];
           } else {
@@ -154,35 +201,7 @@
           item.setIcon(settings.icon);
           item.setAction(settings.click);
           item.element = item.el;
-          return {
-            show: function() {
-              return item.setHidden(false);
-            },
-            hide: function() {
-              return item.setHidden(true);
-            },
-            setActive: function(bool) {
-              return item.setChecked(bool);
-            },
-            setState: function(bool) {
-              return item.setChecked(bool);
-            },
-            setActiveButton: function(a, b) {
-              return console.log("" + slot + " SETACTIVEBUTTON:", a, b);
-            },
-            enable: function() {
-              return item.setDisabled(false);
-            },
-            disable: function() {
-              return item.setDisabled(true);
-            },
-            focus: function(a) {
-              return console.log("" + slot + " TODO:FOCUS:", a);
-            },
-            foreground: function(a) {
-              return console.log("" + slot + " TODO:FOREGROUND:", a);
-            }
-          };
+          return new ItemRelay([item]);
         };
         applyHeading = function() {
           var $newEl, $oldEl, rangeObject;

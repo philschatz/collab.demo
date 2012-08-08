@@ -68,6 +68,22 @@ define [ "aloha", "aloha/plugin", "ui/ui", 'ribbon/ribbon-plugin', "i18n!format/
       # Hijack the toolbar buttons so we can customize where they are placed.
       
       Ui.adopt = (slot, type, settings) ->
+        # This class adapts button functions Aloha expects to functions the appmenu uses
+        class ItemRelay
+          constructor: (@items) ->
+          show: () -> item.setHidden false for item in @items
+          hide: () -> item.setHidden true for item in @items
+          setActive: (bool) -> item.setChecked bool for item in @items
+          setState: (bool) -> @setActive bool
+          enable: (bool=true) -> item.setDisabled !bool for item in @items
+          disable: () -> item.setDisabled true for item in @items
+          setActiveButton: (a, b) ->
+            console.log "#{slot} TODO:SETACTIVEBUTTON:", a, b
+          focus: (a) ->
+            console.log "#{slot} TODO:FOCUS:", a
+          foreground: (a) ->
+            console.log "#{slot} TODO:FOREGROUND:", a
+
         if slot of menuLookup and slot of toolbarLookup
           item = menuLookup[slot]
           item2 = toolbarLookup[slot]
@@ -82,32 +98,7 @@ define [ "aloha", "aloha/plugin", "ui/ui", 'ribbon/ribbon-plugin', "i18n!format/
           item2.setIcon(settings.icon)
           item2.setAction(settings.click)
 
-          return {
-            show: () ->
-              item.setHidden false
-              item2.setHidden false
-            hide: () ->
-              item.setHidden true
-              item2.setHidden true
-            setActive: (bool) ->
-              item.setChecked bool
-              item2.setChecked bool
-            setState: (bool) ->
-              item.setChecked(bool)
-              item2.setChecked(bool)
-            enable: () ->
-              item.setDisabled false
-              item2.setDisabled false
-            disable: () ->
-              item.setDisabled true
-              item2.setDisabled true
-            setActiveButton: (a, b) ->
-              console.log "#{slot} TODO:SETACTIVEBUTTON:", a, b
-            focus: (a) ->
-              console.log "#{slot} TODO:FOCUS:", a
-            foreground: (a) ->
-              console.log "#{slot} TODO:FOREGROUND:", a
-          }
+          return new ItemRelay([item, item2])
           
         else if slot of menuLookup or slot of toolbarLookup
           item = menuLookup[slot] or toolbarLookup[slot]
@@ -119,27 +110,7 @@ define [ "aloha", "aloha/plugin", "ui/ui", 'ribbon/ribbon-plugin', "i18n!format/
         item.setAction(settings.click)
         item.element = item.el # CreateTable and some others do onclick () -> this.element
 
-        return {
-          show: () ->
-            item.setHidden false
-          hide: () ->
-            item.setHidden true
-          setActive: (bool) ->
-            item.setChecked bool
-          setState: (bool) ->
-            item.setChecked(bool)
-          setActiveButton: (a, b) ->
-            console.log "#{slot} SETACTIVEBUTTON:", a, b
-          enable: () ->
-            item.setDisabled false
-          disable: () ->
-            item.setDisabled true
-          focus: (a) ->
-            console.log "#{slot} TODO:FOCUS:", a
-          foreground: (a) ->
-            console.log "#{slot} TODO:FOREGROUND:", a
-        }
-        
+        return new ItemRelay([item])
 
       
       applyHeading = () ->
