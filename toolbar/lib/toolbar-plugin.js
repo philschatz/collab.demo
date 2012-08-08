@@ -35,7 +35,7 @@
 
   toolbarSettings = ['bold', 'italic', 'underline', '', 'insertLink', 'insertImage', 'insertFigure', '', 'orderedList', 'unorderedList', 'outdentList', 'indentList', '', "alignLeft", "alignCenter", "alignRight", "alignJustify"];
 
-  define(["aloha", "aloha/plugin", "ui/ui", 'ribbon/ribbon-plugin', "i18n!format/nls/i18n", "i18n!aloha/nls/i18n", "aloha/console", "css!toolbar/css/toolbar.css"], function(Aloha, Plugin, Ui, Ribbon, i18n, i18nCore) {
+  define(["aloha", "aloha/plugin", "ui/ui", 'ribbon/ribbon-plugin', '../../appmenu/appmenu', "i18n!format/nls/i18n", "i18n!aloha/nls/i18n", "aloha/console", "css!toolbar/css/toolbar.css"], function(Aloha, Plugin, Ui, Ribbon, appmenu, i18n, i18nCore) {
     var CONTAINER_JQUERY;
     CONTAINER_JQUERY = jQuery('.toolbar') || jQuery('<div></div>').addClass('toolbar-container').appendTo('body');
     /*
