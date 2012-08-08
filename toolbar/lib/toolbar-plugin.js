@@ -37,7 +37,10 @@
 
   define(["aloha", "aloha/plugin", "ui/ui", 'ribbon/ribbon-plugin', '../../appmenu/appmenu', "i18n!format/nls/i18n", "i18n!aloha/nls/i18n", "aloha/console", "css!toolbar/css/toolbar.css"], function(Aloha, Plugin, Ui, Ribbon, appmenu, i18n, i18nCore) {
     var CONTAINER_JQUERY;
-    CONTAINER_JQUERY = jQuery('.toolbar') || jQuery('<div></div>').addClass('toolbar-container').appendTo('body');
+    CONTAINER_JQUERY = jQuery('.toolbar');
+    if (CONTAINER_JQUERY.length === 0) {
+      CONTAINER_JQUERY = jQuery('<div></div>').addClass('toolbar-container').appendTo('body');
+    }
     /*
        register the plugin with unique name
     */
@@ -45,7 +48,7 @@
       init: function() {
         var applyHeading, item, labels, menu, menuLookup, menubar, order, recurse, subMenuItems, tab, toolbar, toolbarLookup, _i, _j, _len, _len2;
         window.menubar = menubar = new appmenu.MenuBar([]);
-        menubar.el.appendTo($('.menubar'));
+        menubar.el.appendTo(CONTAINER_JQUERY);
         window.toolbar = toolbar = new appmenu.ToolBar();
         toolbar.el.appendTo(CONTAINER_JQUERY);
         toolbar.el.addClass('aloha');
