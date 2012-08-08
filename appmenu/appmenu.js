@@ -419,8 +419,12 @@ ToolButton > MenuItem = [ tooltop+, (checked means pressed) ]
 
   })(appmenu.MenuItem);
 
-  if (typeof module !== "undefined" && module !== null) module.exports = appmenu;
-
-  if (typeof window !== "undefined" && window !== null) window.appmenu = appmenu;
+  if (typeof define !== "undefined" && define !== null) {
+    define(["css!./appmenu.css"], function() {
+      return appmenu;
+    });
+  } else if (typeof window !== "undefined" && window !== null) {
+    window.appmenu = appmenu;
+  }
 
 }).call(this);

@@ -1,3 +1,5 @@
+# Note: appmenu will register itself if the define() function exists (so it can be loaded as a RequireJS package) and falls back to attaching to the window object otherwise
+
 ###
 The 2 base classes are Menu and MenuItem.
 For a MenuBar the children can be MenuButtons (MenuItem w/ just text)
@@ -288,7 +290,8 @@ class appmenu.custom.Heading extends appmenu.MenuItem
     else
       super(cls)
 
-if module?
-  module.exports = appmenu
-if window?
+if define?
+  define ["css!./appmenu.css"], () ->
+    appmenu
+else if window?
   window.appmenu = appmenu
