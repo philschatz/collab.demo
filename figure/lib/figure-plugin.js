@@ -38,7 +38,7 @@
     */
     return Plugin.create("figure", {
       init: function() {
-        var FigureBlock, editable, initializeBlocks, _i, _len, _ref;
+        var FigureBlock, editable, initializeEditable, initializeFigures, _i, _len, _ref;
         Ui.adopt('insertFigure', {
           isInstance: function() {
             return false;
@@ -51,9 +51,10 @@
             markup = jQuery("<figure><span class='media'><img src='" + (Aloha.getPluginUrl('image')) + "/img/blank.jpg'/></span><figcaption>Enter Caption Here</figcaption></figure>");
             rangeObject = Aloha.Selection.getRangeObject();
             GENTICS.Utils.Dom.insertIntoDOM(markup, rangeObject, jQuery(Aloha.activeEditable.obj));
-            return markup.alohaBlock({
+            markup.alohaBlock({
               'aloha-block-type': 'FigureBlock'
             });
+            return initializeFigures(markup);
           }
         });
         FigureBlock = block.AbstractBlock.extend({
@@ -78,16 +79,15 @@
             return console.log('Ignoring figure click');
           },
           _preventSelectionChangedEventHandler: function(evt) {
-            return console.log('Ignoring figure mousedown/focus/something');
+            console.log('Ignoring figure mousedown/focus/something');
+            return window.setTimeout((function() {
+              return jQuery(this).trigger('focus');
+            }), 1);
           }
         });
         BlockManager.registerBlockType('FigureBlock', FigureBlock);
-        initializeBlocks = function($editable) {
-          var figures;
-          figures = $editable.find('figure:not(.aloha-block)').alohaBlock({
-            'aloha-block-type': 'FigureBlock'
-          });
-          return figures.find('img').on('drop', function(dropEvent) {
+        initializeFigures = function($figures) {
+          return $figures.find('img').on('drop', function(dropEvent) {
             var dt, img, readFile;
             img = jQuery(dropEvent.target);
             dropEvent.preventDefault();
@@ -111,13 +111,18 @@
             }
           });
         };
+        initializeEditable = function($editable) {
+          return initializeFigures($editable.find('figure:not(.aloha-block)').alohaBlock({
+            'aloha-block-type': 'FigureBlock'
+          }));
+        };
         _ref = Aloha.editables;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           editable = _ref[_i];
-          initializeBlocks(editable.obj);
+          initializeEditable(editable.obj);
         }
         return Aloha.bind('aloha-editable-created', function($event, editable) {
-          return initializeBlocks(editable.obj);
+          return initializeEditable(editable.obj);
         });
       },
       /*
