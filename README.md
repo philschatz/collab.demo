@@ -1,5 +1,18 @@
+------------------------------
+
+**The sourcecode here is deprecated!**
+
+The newest version of the editor you will find here:
+
+https://github.com/wysiwhat/Aloha-Editor (sourcecode)
+
+http://wysiwhat.github.com/Aloha-Editor (demo)
+
+------------------------------
+
+
 What is This?
-=========
+=============
 
 Educational content doesn't quite match the HTML model (especially educational books).
 For example, HTML has no notion of glossary terms and definitions, exercise problems and solutions, equations, etc.
