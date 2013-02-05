@@ -1,6 +1,7 @@
 ------------------------------
 
 **The sourcecode here is deprecated!**
+======================================
 
 The newest version of the editor you will find here:
 
